@@ -1,0 +1,451 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "chgeuer"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "deploymentName": {
+            "type": "string",
+            "defaultValue": "wp1",
+            "metadata": { "description": "Unique identifier which becomes part of all names, like storage accounts" }
+        },
+        "dnsNameForPublicIP": {
+            "type": "string",
+            "defaultValue": "wp1",
+            "metadata": { "description": "Unique DNS Name for the Public IP used to access the Virtual Machine." }
+        },
+        "instanceCount": {
+            "type": "int",
+            "defaultValue": 4
+        },
+        "deploymentBitsBaseUrl": {
+            "type": "string",
+            "defaultValue": "https://wp24hrennen.blob.core.windows.net/bin/"
+        },
+        "serviceBitArchiveFilename": {
+            "type": "string",
+            "defaultValue": "20160411-full.tgz"
+        },
+        "deploymentBitsSas": {
+            "type": "string",
+            "defaultValue": "?sv=2014-02-14&sr=c&sp=r&st=2016-04-10T22%3A00%3A00Z&se=2016-05-27T22%3A00%3A00Z&sig=..."
+        }
+    },
+    "variables": {
+        "apiVersions": {
+            "storageAccounts": "2015-06-15",
+            "networkSecurityGroups": "2015-06-15",
+            "loadBalancers": "2016-03-30",
+            "virtualNetworks": "2015-06-15",
+            "publicIPAddresses": "2015-06-15",
+            "networkInterfaces": "2015-06-15",
+            "virtualMachines": "2015-06-15",
+            "virtualMachineScaleSets": "2015-06-15"
+        },
+        "suffix": {
+            "jumphost": "jumphost",
+            "web": "web"
+        },
+        "newStorageAccountSuffix": "[concat(parameters('deploymentName'), 'vmss')]",
+        "storageAccountPrefix": [ "a", "g", "m", "s", "y" ],
+        "storageAccountNameSuffix": "[toLower(replace(parameters('deploymentName'),'-',''))]",
+        "storageAccountNames": {
+            "jumphost": "[concat(variables('suffix').jumphost, parameters('deploymentName'))]"
+        },
+        "publicIPs": {
+            "jumphost": "jumphost",
+            "web": "web",
+            "domainNames": {
+                "www": "[concat(parameters('deploymentName'), '.', resourceGroup().location, '.cloudapp.azure.com')]"
+            }
+        },
+        "networkIPv4RangeFirstTwoBytes": "10.0",
+        "addressPrefix": {
+            "global": "[concat(variables('networkIPv4RangeFirstTwoBytes'), '.0')]",
+            "web": "[concat(variables('networkIPv4RangeFirstTwoBytes'), '.0')]"
+        },
+        "addressrange": {
+            "global": "[concat(variables('addressPrefix').global, '.0/16')]",
+            "web": "[concat(variables('addressPrefix').web, '.0/24')]",
+            "machineIPs": {
+                "jumphost": "[concat(variables('addressPrefix').web, '.250')]"
+            }
+        },
+        "vnet": {
+            "name": "[concat(parameters('deploymentName'),'-vnet')]",
+            "address": "[variables('addressrange').global]",
+            "subnet": {
+                "web": {
+                    "name": "[concat(parameters('deploymentName'), '-subnet-', variables('suffix').web)]",
+                    "address": "[variables('addressrange').web]"
+                }
+            }
+        },
+        "vm": {
+            "images": {
+                "standard": {
+                    "publisher": "Canonical",
+                    "offer": "UbuntuServer",
+                    "sku": "14.04.4-LTS",
+                    "version": "latest"
+                }
+            },
+            "vmStorageAccountContainerName": "vhds",
+            "web": { "size": "Standard_D1_v2" },
+            "jumphost": { "size": "Standard_A1" }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "location": "[resourceGroup().location]",
+            "name": "networkSecurityGroupwebs",
+            "tags": { "displayName": "NetworkSecurityGroup webs" },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "jumhost-ssh-in",
+                        "properties": {
+                            "priority": 100,
+                            "description": "Allow TCP/22 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet", "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[concat(variables('addressrange').machineIPs.jumphost, '/32')]",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
+                        "name": "web-http-in",
+                        "properties": {
+                            "priority": 101,
+                            "description": "Allow TCP/80 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet", "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('addressrange').web]",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "block-everything",
+                        "properties": {
+                            "priority": 4096,
+                            "description": "Block all inbound traffic",
+                            "access": "Deny",
+                            "direction": "Inbound",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[concat(variables('addressrange').machineIPs.jumphost, '/32')]",
+                            "destinationPortRange": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "[variables('apiVersions').virtualNetworks]",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('vnet').name]",
+            "tags": { "displayName": "Virtual Network" },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', 'networkSecurityGroupwebs')]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vnet').address]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('vnet').subnet.web.name]",
+                        "properties": {
+                            "addressPrefix": "[variables('vnet').subnet.web.address]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'networkSecurityGroupwebs')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "[variables('apiVersions').publicIPAddresses]",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('publicIPs').jumphost]",
+            "tags": { "displayName": "Jump Host - Public IP" },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(parameters('deploymentName'), '-ssh')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "[variables('apiVersions').publicIPAddresses]",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('publicIPs').web]",
+            "tags": { "displayName": "Web Tier - Public IP" },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(parameters('deploymentName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[variables('apiVersions').storageAccounts]",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('storageAccountNames').jumphost]",
+            "properties": { "accountType": "Standard_LRS" },
+            "tags": { "displayName": "StorageAccount Jumphost" }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "[variables('apiVersions').networkInterfaces]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat('nic-', variables('suffix').jumphost)]",
+            "tags": { "displayName": "Jump Host - Network Interface Card" },
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('vnet').name)]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPs').jumphost)]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[variables('addressrange').machineIPs.jumphost]",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPs').jumphost)]"
+                            },
+                            "subnet": {
+                                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks',variables('vnet').name), '/subnets/', variables('vnet').subnet.web.name)]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "[variables('apiVersions').virtualMachines]",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('suffix').jumphost]",
+            "tags": { "displayName": "Jump Host - Virtual Machine" },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountNames').jumphost)]",
+                "[concat('Microsoft.Network/networkInterfaces/', concat('nic-', variables('suffix').jumphost))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('vm').jumphost.size]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('suffix').jumphost]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('vm').images.standard.publisher]",
+                        "offer": "[variables('vm').images.standard.offer]",
+                        "sku": "[variables('vm').images.standard.sku]",
+                        "version": "[variables('vm').images.standard.version]"
+                    },
+                    "osDisk": {
+                        "name": "[concat(variables('suffix').jumphost, '-osdisk')]",
+                        "vhd": {
+                            "uri": "[concat('https://', variables('storageAccountNames').jumphost, '.blob.core.windows.net/', 'vhds', '/', concat(variables('suffix').jumphost, '-osdisk'),'.vhd') ]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-', variables('suffix').jumphost))]"
+                        }
+                    ]
+                }
+            }
+        },
+
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[variables('apiVersions').storageAccounts]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(variables('storageAccountPrefix')[copyIndex()], variables('newStorageAccountSuffix'))]",
+            "tags": { "displayName": "Storage Accounts - VM ScaleSet" },
+            "copy": {
+                "name": "vmssstorageLoop",
+                "count": "[length(variables('storageAccountPrefix'))]"
+            },
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "myLoadbalancerName",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "[variables('apiVersions').loadBalancers]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('vnet').name)]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPs').web)]"
+            ],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "myLoadBalancerFrontEnd",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPs').web)]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "myBackendAddressPool"
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "probe-http",
+                        "properties": {
+                            "protocol": "Http",
+                            "port": 80,
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "requestPath": "/"
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "nlb-rule-http",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5,
+                            "probe": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/probes/', 'probe-http')]" },
+                            "frontendIPConfiguration": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
+                            "backendAddressPool": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/backendAddressPools/', 'myBackendAddressPool')]" }
+                        }
+                    }
+
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "[variables('apiVersions').virtualMachineScaleSets]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(parameters('deploymentName'),'-webs')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[0], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[1], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[2], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[3], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[4], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Network/loadBalancers/', 'myLoadbalancerName')]"
+            ],
+            "sku": {
+                "name": "[variables('vm').web.size]",
+                "tier": "Standard",
+                "capacity": "[parameters('instanceCount')]"
+            },
+            "tags": { "displayName": "Virtual Machine ScaleSet" },
+            "properties": {
+                "upgradePolicy": {
+                    "mode": "Automatic"
+                },
+                "virtualMachineProfile": {
+                    "storageProfile": {
+                        "osDisk": {
+                            "name": "VMSSOsDisk",
+                            "caching": "ReadWrite",
+                            "createOption": "FromImage",
+                            "vhdContainers": [
+                                "[concat('https://',variables('storageAccountPrefix')[0],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[1],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[2],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[3],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[4],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]"
+                            ]
+                        },
+                        "imageReference": {
+                            "publisher": "[variables('vm').images.standard.publisher]",
+                            "offer": "[variables('vm').images.standard.offer]",
+                            "sku": "[variables('vm').images.standard.sku]",
+                            "version": "[variables('vm').images.standard.version]"
+                        }
+                    },
+                    "osProfile": {
+                        "computerNamePrefix": "[concat('vm',parameters('deploymentName'))]",
+                        "adminUsername": "[parameters('adminUsername')]",
+                        "adminPassword": "[parameters('adminPassword')]"
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "vmssnic",
+                                "properties": {
+                                    "primary": true,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "myVirtualMachineScaleSetIpConfiguration",
+                                            "properties": {
+                                                "subnet": { "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('vnet').name), '/subnets/', variables('vnet').subnet.web.name)]" },
+                                                "loadBalancerBackendAddressPools": [ { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/backendAddressPools/', 'myBackendAddressPool')]" } ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "extensionProfile": {
+                        "extensions": [
+                            {
+                                "name": "CustomScriptExtensionVMSS",
+                                "properties": {
+                                    "publisher": "Microsoft.OSTCExtensions",
+                                    "type": "CustomScriptForLinux",
+                                    "typeHandlerVersion": "1.4",
+                                    "autoUpgradeMinorVersion": false,
+                                    "settings": {
+                                        "fileUris": [
+                                            "https://raw.githubusercontent.com/chgeuer/wordpress24h/master/ARM/install.sh",
+                                            "[concat(parameters('deploymentBitsBaseUrl'), parameters('serviceBitArchiveFilename'), parameters('deploymentBitsSas'))]"
+                                        ],
+                                        "commandToExecute": "[concat('bash install.sh ', parameters('serviceBitArchiveFilename'), ' ', variables('publicIPs').domainNames.www)]"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}
