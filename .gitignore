@@ -1,2 +1,4 @@
 /.vs/wordpress24h/v14/*.suo
 /.vs/td/v14/.suo
+/ARM/bin
+/ARM/obj
