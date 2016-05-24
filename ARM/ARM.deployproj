@@ -29,8 +29,11 @@
       <Visible>False</Visible>
     </None>
     <Content Include="azuredeploy.json" />
-    <None Include="install.sh" />
-    <None Include="json.json" />
+    <None Include="longterm.json" />
+    <None Include="scripts\install-db.sh" />
+    <None Include="scripts\install-hostserver.sh" />
+    <None Include="scripts\install-regserver.sh" />
+    <None Include="scripts\install-webportal.sh" />
   </ItemGroup>
   <Target Name="GetReferenceAssemblyPaths" />
 </Project>
