@@ -2,30 +2,28 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "tenantName": {
+            "type": "string",
+            "defaultValue": "nrw"
+        },
         "adminUsername": {
             "type": "string",
             "defaultValue": "chgeuer"
         },
-        "adminPassword": {
-            "type": "securestring"
-        },
-        "tenantName": {
+        "adminSecureShellKey": {
             "type": "string",
-            "defaultValue": "wp1",
-            "metadata": { "description": "Unique identifier which becomes part of all names, like storage accounts" }
-        },
-        "dnsNameForPublicIP": {
-            "type": "string",
-            "defaultValue": "wp1",
-            "metadata": { "description": "Unique DNS Name for the Public IP used to access the Virtual Machine." }
+            "defaultValue": "ssh-rsa AAAAB3Ndeadbeef==",
+            "metadata": { "description": "Admin SSH key for the Virtual Machines." }
         },
         "regServerInstanceCount": {
             "type": "int",
             "defaultValue": 2
+        },
+        "longtermResourceGroupName": {
+            "type": "string"
         }
     },
     "variables": {
-        "repositoryUrl": "https://raw.githubusercontent.com/chgeuer/td/master/",
         "apiVersions": {
             "storageAccounts": "2015-06-15",
             "networkSecurityGroups": "2015-06-15",
@@ -36,57 +34,65 @@
             "virtualMachines": "2015-06-15",
             "virtualMachineScaleSets": "2015-06-15"
         },
-        "suffix": {
-            "jumphost": "jumphost",
-            "web": "web"
+        "publicIPs": {
+            "regserver": "regserver",
+            "hostserver": "hostserver",
+            "webportal": "webportal"
         },
+        "ipAddressId": {
+            "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').regserver))]",
+            "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
+            "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
+        },
+        "repositoryUrl": "https://raw.githubusercontent.com/chgeuer/td/master/",
         "newStorageAccountSuffix": "[concat(parameters('tenantName'), 'vmss')]",
         "storageAccountPrefix": [ "a", "g", "m", "s", "y" ],
         "storageAccountNameSuffix": "[toLower(replace(parameters('tenantName'),'-',''))]",
-        "storageAccountNames": {
-            "jumphost": "[concat(variables('suffix').jumphost, parameters('tenantName'))]"
-        },
-        "publicIPs": {
-            "jumphost": "jumphost",
-            "web": "web",
-            "domainNames": {
-                "www": "[concat(parameters('tenantName'), '.', resourceGroup().location, '.cloudapp.azure.com')]"
-            }
-        },
-        "networkIPv4RangeFirstTwoBytes": "10.0",
-        "addressPrefix": {
-            "global": "[concat(variables('networkIPv4RangeFirstTwoBytes'), '.0')]",
-            "web": "[concat(variables('networkIPv4RangeFirstTwoBytes'), '.0')]"
-        },
         "addressrange": {
-            "global": "[concat(variables('addressPrefix').global, '.0/16')]",
-            "web": "[concat(variables('addressPrefix').web, '.0/24')]",
-            "machineIPs": {
-                "jumphost": "[concat(variables('addressPrefix').web, '.250')]"
-            }
+            "global": "10.0.0.0/16",
+            "regserver": "10.0.0.0/24",
+            "regserverdatabase": "10.0.0.1/24",
+            "hostserver": "10.0.0.2/24",
+            "webportal": "10.0.0.3/24"
         },
         "vnet": {
             "name": "[concat(parameters('tenantName'),'-vnet')]",
             "address": "[variables('addressrange').global]",
             "subnet": {
-                "web": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', variables('suffix').web)]",
-                    "address": "[variables('addressrange').web]"
+                "regserver": {
+                    "name": "[concat(parameters('tenantName'), '-subnet-', 'regserver')]",
+                    "address": "[variables('addressrange').regserver]"
+                },
+                "regserverdatabase": {
+                    "name": "[concat(parameters('tenantName'), '-subnet-', 'regserverdatabase')]",
+                    "address": "[variables('addressrange').regserverdatabase]"
+                },
+                "hostserver": {
+                    "name": "[concat(parameters('tenantName'), '-subnet-', 'hostserver')]",
+                    "address": "[variables('addressrange').hostserver]"
+                },
+                "webportal": {
+                    "name": "[concat(parameters('tenantName'), '-subnet-', 'webportal')]",
+                    "address": "[variables('addressrange').webportal]"
                 }
             }
         },
         "vm": {
+            "vmStorageAccountContainerName": "vhds",
             "images": {
                 "standard": {
-                    "publisher": "Canonical",
-                    "offer": "UbuntuServer",
-                    "sku": "14.04.4-LTS",
+                    "publisher": "OpenLogic",
+                    "offer": "CentOS",
+                    "sku": "7.2",
                     "version": "latest"
                 }
             },
-            "vmStorageAccountContainerName": "vhds",
-            "web": { "size": "Standard_D1_v2" },
-            "jumphost": { "size": "Standard_A1" }
+            "size": {
+                "regserver": "Standard_A1",
+                "regserverdatabase": "Standard_A1",
+                "hostserver": "Standard_A1",
+                "webportal": "Standard_A1"
+            }
         }
     },
     "resources": [
@@ -94,34 +100,78 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
             "location": "[resourceGroup().location]",
-            "name": "networkSecurityGroupwebs",
-            "tags": { "displayName": "NetworkSecurityGroup webs" },
+            "name": "networkSecurityGroup",
+            "tags": { "displayName": "NetworkSecurityGroup" },
             "properties": {
                 "securityRules": [
                     {
-                        "name": "jumhost-ssh-in",
+                        "name": "regserver-http-in",
                         "properties": {
                             "priority": 100,
-                            "description": "Allow TCP/22 Inbound",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "Internet", "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[concat(variables('addressrange').machineIPs.jumphost, '/32')]",
-                            "destinationPortRange": "22"
-                        }
-                    },
-                    {
-                        "name": "web-http-in",
-                        "properties": {
-                            "priority": 101,
                             "description": "Allow TCP/80 Inbound",
                             "access": "Allow",
                             "direction": "Inbound",
                             "protocol": "Tcp",
-                            "sourceAddressPrefix": "Internet", "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').web]",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
                             "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "regserver-https-in",
+                        "properties": {
+                            "priority": 101,
+                            "description": "Allow TCP/443 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
+                            "destinationPortRange": "443"
+                        }
+                    },
+                    {
+                        "name": "regserver-to-regserverdatabase",
+                        "properties": {
+                            "priority": 102,
+                            "description": "Allow TCP/3306 MySQL to Database",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[variables('addressrange').regserver]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('addressrange').regserverdatabase]",
+                            "destinationPortRange": "3306"
+                        }
+                    },
+                    {
+                        "name": "hostserver-http-in",
+                        "properties": {
+                            "priority": 103,
+                            "description": "Allow TCP/80 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('addressrange').hostserver]",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "hostserver-https-in",
+                        "properties": {
+                            "priority": 104,
+                            "description": "Allow TCP/443 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('addressrange').hostserver]",
+                            "destinationPortRange": "443"
                         }
                     },
                     {
@@ -134,7 +184,7 @@
                             "protocol": "*",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[concat(variables('addressrange').machineIPs.jumphost, '/32')]",
+                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
                             "destinationPortRange": "*"
                         }
                     }
@@ -148,12 +198,12 @@
             "name": "[variables('vnet').name]",
             "tags": { "displayName": "Virtual Network" },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', 'networkSecurityGroupwebs')]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', 'networkSecurityGroup')]"
             ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('vnet').address]"
+                        "[variables('addressrange').global]"
                     ]
                 },
                 "subnets": [
@@ -168,40 +218,6 @@
                     }
                 ]
             }
-        },
-        {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "[variables('apiVersions').publicIPAddresses]",
-            "location": "[resourceGroup().location]",
-            "name": "[variables('publicIPs').jumphost]",
-            "tags": { "displayName": "Jump Host - Public IP" },
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[concat(parameters('tenantName'), '-ssh')]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "[variables('apiVersions').publicIPAddresses]",
-            "location": "[resourceGroup().location]",
-            "name": "[variables('publicIPs').web]",
-            "tags": { "displayName": "Web Tier - Public IP" },
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[concat(parameters('tenantName'))]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "[variables('apiVersions').storageAccounts]",
-            "location": "[resourceGroup().location]",
-            "name": "[variables('storageAccountNames').jumphost]",
-            "properties": { "accountType": "Standard_LRS" },
-            "tags": { "displayName": "StorageAccount Jumphost" }
         },
         {
             "type": "Microsoft.Network/networkInterfaces",
@@ -231,51 +247,6 @@
                 ]
             }
         },
-        {
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "[variables('apiVersions').virtualMachines]",
-            "location": "[resourceGroup().location]",
-            "name": "[variables('suffix').jumphost]",
-            "tags": { "displayName": "Jump Host - Virtual Machine" },
-            "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountNames').jumphost)]",
-                "[concat('Microsoft.Network/networkInterfaces/', concat('nic-', variables('suffix').jumphost))]"
-            ],
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[variables('vm').jumphost.size]"
-                },
-                "osProfile": {
-                    "computerName": "[variables('suffix').jumphost]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "[variables('vm').images.standard.publisher]",
-                        "offer": "[variables('vm').images.standard.offer]",
-                        "sku": "[variables('vm').images.standard.sku]",
-                        "version": "[variables('vm').images.standard.version]"
-                    },
-                    "osDisk": {
-                        "name": "[concat(variables('suffix').jumphost, '-osdisk')]",
-                        "vhd": {
-                            "uri": "[concat('https://', variables('storageAccountNames').jumphost, '.blob.core.windows.net/', 'vhds', '/', concat(variables('suffix').jumphost, '-osdisk'),'.vhd') ]"
-                        },
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-', variables('suffix').jumphost))]"
-                        }
-                    ]
-                }
-            }
-        },
-
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "[variables('apiVersions').storageAccounts]",
