@@ -30,9 +30,9 @@
             "webportal": "webportal"
         },
         "ipAddressId": {
-            "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').regserver))]",
-            "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
-            "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
+            "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(variables('tenantName'), '-', variables('publicIPs').regserver))]",
+            "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(variables('tenantName'), '-', variables('publicIPs').hostserver))]",
+            "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(variables('tenantName'), '-', variables('publicIPs').webportal))]"
         },
         "addressrange": {
             "global": "10.0.0.0/16",
