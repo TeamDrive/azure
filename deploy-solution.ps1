@@ -25,7 +25,7 @@ New-AzureRmResourceGroup `
 
 Test-AzureRmResourceGroupDeployment `
 	-ResourceGroupName $resourceGroupName `
-	-TemplateUri "$($repositoryUrl)/ARM/azuredeploy.json" `
+	-TemplateUri "$($repositoryUrl)/ARM/shared-resources.json" `
 	-TemplateParameterObject $parameters `
 	-Mode Complete  `
 	-Verbose
