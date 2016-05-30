@@ -12,7 +12,7 @@
         },
         "adminSecureShellKey": {
             "type": "string",
-            "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAklvcJCA1K82mjlxM1ZHP1PF7eqKZ5KcmxLeNSJ7vMLD1/XUMZ667P2Ep7iu/J4Ci4u6V4LyYDodhRRFZaaxMFHTUVTwcApuh0fl4UJY/Evd6R+A66zxG8oSG75KQTiOYsV4cZ1PnMfg1Y014n814VGKd68ZHKc2KQFLGfsBZ7Hqc2NIU1Y0AxNaeHG8i9FlhSSCDuk/Lyh3o+vJl3GKFMezua5+rFG+H8wPSCN9tkrf+zpW1ynyXC+xEn9eenLcryyqa9G2MYR1FgClxLTgZzAHYCnmMgsMxxvMVOlI6nLS3sFh4+14j8wgPbv4TzH3AI7PxcGbOvWGvlTsLRL/nmQ==",
+            "defaultValue": "ssh-rsa AAAAB3Ndeadbeef==",
             "metadata": { "description": "Admin SSH key for the Virtual Machines." }
         },
         "regServerInstanceCount": {
@@ -21,27 +21,9 @@
         },
         "longtermResourceGroupName": {
             "type": "string"
-        },
-        "deployRegServer": {
-            "type": "string",
-            "defaultValue": "Enabled",
-            "allowedValues": [
-                "Enabled",
-                "Disabled"
-            ]
-        },
-        "deployPortalServer": {
-            "type": "string",
-            "defaultValue": "Enabled",
-            "allowedValues": [
-                "Enabled",
-                "Disabled"
-            ]
         }
     },
     "variables": {
-        "repositoryUrl": "https://raw.githubusercontent.com/chgeuer/td/master/",
-        "templateBaseUrl": "[variables('repositoryUrl')]",
         "apiVersions": {
             "storageAccounts": "2015-06-15",
             "networkSecurityGroups": "2015-06-15",
@@ -62,6 +44,7 @@
             "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
             "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
         },
+        "repositoryUrl": "https://raw.githubusercontent.com/chgeuer/td/master/",
         "newStorageAccountSuffix": "[concat(parameters('tenantName'), 'vmss')]",
         "storageAccountPrefix": [ "a", "g", "m", "s", "y" ],
         "storageAccountNameSuffix": "[toLower(replace(parameters('tenantName'),'-',''))]",
