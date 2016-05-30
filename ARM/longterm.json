@@ -77,6 +77,16 @@
                 "publicIPAllocationMethod": "Static",
                 "idleTimeoutInMinutes": "[variables('publicIPAddressIdleTimeoutInMinutes')]"
             }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[variables('apiVersions').storageAccounts]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(parameters('tenantName'), 'storage')]",
+            "tags": { "displayName": "Storage Account - Object Storage" },
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
         }
     ],
     "outputs": {
