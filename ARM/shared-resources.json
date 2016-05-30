@@ -6,42 +6,14 @@
             "type": "string",
             "defaultValue": "nrw"
         },
-        "adminUsername": {
-            "type": "string",
-            "defaultValue": "chgeuer"
-        },
-        "adminSecureShellKey": {
-            "type": "string",
-            "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAklvcJCA1K82mjlxM1ZHP1PF7eqKZ5KcmxLeNSJ7vMLD1/XUMZ667P2Ep7iu/J4Ci4u6V4LyYDodhRRFZaaxMFHTUVTwcApuh0fl4UJY/Evd6R+A66zxG8oSG75KQTiOYsV4cZ1PnMfg1Y014n814VGKd68ZHKc2KQFLGfsBZ7Hqc2NIU1Y0AxNaeHG8i9FlhSSCDuk/Lyh3o+vJl3GKFMezua5+rFG+H8wPSCN9tkrf+zpW1ynyXC+xEn9eenLcryyqa9G2MYR1FgClxLTgZzAHYCnmMgsMxxvMVOlI6nLS3sFh4+14j8wgPbv4TzH3AI7PxcGbOvWGvlTsLRL/nmQ==",
-            "metadata": { "description": "Admin SSH key for the Virtual Machines." }
-        },
-        "regServerInstanceCount": {
-            "type": "int",
-            "defaultValue": 2
-        },
         "longtermResourceGroupName": {
             "type": "string"
         },
-        "deployRegServer": {
-            "type": "string",
-            "defaultValue": "Enabled",
-            "allowedValues": [
-                "Enabled",
-                "Disabled"
-            ]
-        },
-        "deployPortalServer": {
-            "type": "string",
-            "defaultValue": "Enabled",
-            "allowedValues": [
-                "Enabled",
-                "Disabled"
-            ]
+        "repositoryUrl": {
+            "type": "string"
         }
     },
     "variables": {
-        "repositoryUrl": "https://raw.githubusercontent.com/chgeuer/td/master/",
-        "templateBaseUrl": "[variables('repositoryUrl')]",
         "apiVersions": {
             "storageAccounts": "2015-06-15",
             "networkSecurityGroups": "2015-06-15",
@@ -62,9 +34,6 @@
             "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
             "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
         },
-        "newStorageAccountSuffix": "[concat(parameters('tenantName'), 'vmss')]",
-        "storageAccountPrefix": [ "a", "g", "m", "s", "y" ],
-        "storageAccountNameSuffix": "[toLower(replace(parameters('tenantName'),'-',''))]",
         "addressrange": {
             "global": "10.0.0.0/16",
             "regserver": "10.0.0.0/24",
@@ -92,23 +61,6 @@
                     "name": "[concat(parameters('tenantName'), '-subnet-', 'webportal')]",
                     "address": "[variables('addressrange').webportal]"
                 }
-            }
-        },
-        "vm": {
-            "vmStorageAccountContainerName": "vhds",
-            "images": {
-                "standard": {
-                    "publisher": "OpenLogic",
-                    "offer": "CentOS",
-                    "sku": "7.2",
-                    "version": "latest"
-                }
-            },
-            "size": {
-                "regserver": "Standard_A1",
-                "regserverdatabase": "Standard_A1",
-                "hostserver": "Standard_A1",
-                "webportal": "Standard_A1"
             }
         }
     },
@@ -231,6 +183,60 @@
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'networkSecurityGroupwebs')]"
                             }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "myLoadbalancerName",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "[variables('apiVersions').loadBalancers]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('vnet').name)]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPs').web)]"
+            ],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "myLoadBalancerFrontEnd",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPs').web)]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "myBackendAddressPool"
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "probe-http",
+                        "properties": {
+                            "protocol": "Http",
+                            "port": 80,
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "requestPath": "/"
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "nlb-rule-http",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5,
+                            "probe": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/probes/', 'probe-http')]" },
+                            "frontendIPConfiguration": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
+                            "backendAddressPool": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/backendAddressPools/', 'myBackendAddressPool')]" }
                         }
                     }
                 ]

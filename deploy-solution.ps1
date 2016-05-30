@@ -13,6 +13,7 @@ $parameters=@{
     regServerInstanceCount=2
 	deployRegServer="Enabled"
 	deployPortalServer="Enabled"
+	repositoryUrl=$repositoryUrl
 }
 
 git commit -am "."
