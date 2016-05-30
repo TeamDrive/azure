@@ -29,8 +29,10 @@
       <Visible>False</Visible>
     </None>
     <Content Include="hostserver.json" />
-    <Content Include="portalserver.json" />
-    <Content Include="regserver.json" />
+    <Content Include="portalserver-disabled.json" />
+    <Content Include="portalserver-enabled.json" />
+    <Content Include="regserver-disabled.json" />
+    <Content Include="regserver-enabled.json" />
     <Content Include="azuredeploy.json" />
     <None Include="longterm.json" />
     <None Include="metadata.json" />
