@@ -2,18 +2,18 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "tenantName": {
-            "type": "string",
-            "defaultValue": "nrw"
-        },
-        "longtermResourceGroupName": {
-            "type": "string"
-        },
-        "repositoryUrl": {
-            "type": "string"
+        "commonSettings": {
+            "type": "object",
+            "metadata": {
+                "Description": "Common settings object"
+            }
         }
     },
     "variables": {
+        "tenantName": "[parameters('commonSettings').tenantName]",
+        "longtermResourceGroupName": "[parameters('commonSettings').longtermResourceGroupName]",
+        "repositoryUrl": "[parameters('commonSettings').repositoryUrl]",
+
         "apiVersions": {
             "storageAccounts": "2015-06-15",
             "networkSecurityGroups": "2015-06-15",
