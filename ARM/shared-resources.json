@@ -30,9 +30,9 @@
             "webportal": "webportal"
         },
         "ipAddressId": {
-            "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').regserver))]",
-            "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
-            "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
+            "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').regserver))]",
+            "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
+            "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
         },
         "addressrange": {
             "global": "10.0.0.0/16",
@@ -42,23 +42,23 @@
             "webportal": "10.0.0.3/24"
         },
         "vnet": {
-            "name": "[concat(parameters('tenantName'),'-vnet')]",
+            "name": "[concat(variables('tenantName'),'-vnet')]",
             "address": "[variables('addressrange').global]",
             "subnet": {
                 "regserver": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'regserver')]",
+                    "name": "[concat(variables('tenantName'), '-subnet-', 'regserver')]",
                     "address": "[variables('addressrange').regserver]"
                 },
                 "regserverdatabase": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'regserverdatabase')]",
+                    "name": "[concat(variables('tenantName'), '-subnet-', 'regserverdatabase')]",
                     "address": "[variables('addressrange').regserverdatabase]"
                 },
                 "hostserver": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'hostserver')]",
+                    "name": "[concat(variables('tenantName'), '-subnet-', 'hostserver')]",
                     "address": "[variables('addressrange').hostserver]"
                 },
                 "webportal": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'webportal')]",
+                    "name": "[concat(variables('tenantName'), '-subnet-', 'webportal')]",
                     "address": "[variables('addressrange').webportal]"
                 }
             }
