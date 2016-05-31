@@ -46,19 +46,23 @@
             "subnet": {
                 "regserver": {
                     "name": "[concat(variables('tenantName'), '-subnet-', 'regserver')]",
-                    "address": "[variables('addressrange').regserver]"
+                    "address": "[variables('addressrange').regserver]",
+                    "nsgName":  "regserver-nsg"
                 },
                 "regserverdatabase": {
                     "name": "[concat(variables('tenantName'), '-subnet-', 'regserverdatabase')]",
-                    "address": "[variables('addressrange').regserverdatabase]"
+                    "address": "[variables('addressrange').regserverdatabase]",
+                    "nsgName": "regserver-db-nsg"
                 },
                 "hostserver": {
                     "name": "[concat(variables('tenantName'), '-subnet-', 'hostserver')]",
-                    "address": "[variables('addressrange').hostserver]"
+                    "address": "[variables('addressrange').hostserver]",
+                    "nsgName": "hostserver-nsg"
                 },
                 "webportal": {
                     "name": "[concat(variables('tenantName'), '-subnet-', 'webportal')]",
-                    "address": "[variables('addressrange').webportal]"
+                    "address": "[variables('addressrange').webportal]",
+                    "nsgName": "portal-nsg"
                 }
             }
         }
@@ -68,8 +72,8 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
             "location": "[resourceGroup().location]",
-            "name": "networkSecurityGroup",
-            "tags": { "displayName": "NetworkSecurityGroup" },
+            "name": "[variables('vnet').subnet.regserver.nsgName]",
+            "tags": { "displayName": "NetworkSecurityGroup RegServer" },
             "properties": {
                 "securityRules": [
                     {
@@ -166,7 +170,7 @@
             "name": "[variables('vnet').name]",
             "tags": { "displayName": "Virtual Network" },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', 'networkSecurityGroup')]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.regserver.nsgName)]"
             ],
             "properties": {
                 "addressSpace": {
@@ -176,66 +180,12 @@
                 },
                 "subnets": [
                     {
-                        "name": "[variables('vnet').subnet.web.name]",
+                        "name": "[variables('vnet').subnet.regserver.name]",
                         "properties": {
-                            "addressPrefix": "[variables('vnet').subnet.web.address]",
+                            "addressPrefix": "[variables('vnet').subnet.regserver.address]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'networkSecurityGroupwebs')]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserver.nsgName)]"
                             }
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/loadBalancers",
-            "name": "myLoadbalancerName",
-            "location": "[resourceGroup().location]",
-            "apiVersion": "[variables('apiVersions').loadBalancers]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', variables('vnet').name)]",
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPs').web)]"
-            ],
-            "properties": {
-                "frontendIPConfigurations": [
-                    {
-                        "name": "myLoadBalancerFrontEnd",
-                        "properties": {
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPs').web)]"
-                            }
-                        }
-                    }
-                ],
-                "backendAddressPools": [
-                    {
-                        "name": "myBackendAddressPool"
-                    }
-                ],
-                "probes": [
-                    {
-                        "name": "probe-http",
-                        "properties": {
-                            "protocol": "Http",
-                            "port": 80,
-                            "intervalInSeconds": 5,
-                            "numberOfProbes": 2,
-                            "requestPath": "/"
-                        }
-                    }
-                ],
-                "loadBalancingRules": [
-                    {
-                        "name": "nlb-rule-http",
-                        "properties": {
-                            "protocol": "Tcp",
-                            "frontendPort": 80,
-                            "backendPort": 80,
-                            "enableFloatingIP": false,
-                            "idleTimeoutInMinutes": 5,
-                            "probe": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/probes/', 'probe-http')]" },
-                            "frontendIPConfiguration": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
-                            "backendAddressPool": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'myLoadbalancerName'), '/backendAddressPools/', 'myBackendAddressPool')]" }
                         }
                     }
                 ]
