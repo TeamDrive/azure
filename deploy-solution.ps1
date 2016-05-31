@@ -27,7 +27,7 @@ git push origin master
 # 	-Name $resourceGroupName `
 # 	-Location $location
 
-Test-AzureRmResourceGroupDeployment `
+New-AzureRmResourceGroupDeployment `
 	-ResourceGroupName $resourceGroupName `
 	-TemplateUri "$($repositoryUrl)/ARM/shared-resources.json" `
 	-TemplateParameterObject $parameters `
