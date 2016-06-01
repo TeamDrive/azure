@@ -23,9 +23,9 @@ $parameters=@{
 git commit -am "."
 git push origin master
 
-# New-AzureRmResourceGroup `
-# 	-Name $resourceGroupName `
-# 	-Location $location
+New-AzureRmResourceGroup `
+ 	-Name $resourceGroupName `
+ 	-Location $location
 
 Test-AzureRmResourceGroupDeployment `
 	-ResourceGroupName $resourceGroupName `
