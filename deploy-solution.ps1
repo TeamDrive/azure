@@ -1,9 +1,9 @@
 $location = "West Europe"
 $branch = "master"
-$branch = "43cadbaf8898fd405efb7bbcf815b2c5c1ade5df"
+# $branch = "3be71047b1875d3343b68eb38c5066f82c3d6451"
 $repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/$($branch)/"
 
-$tenantName = "saxony3"
+$tenantName = "saxony4"
 $resourceGroupName = "rg-$($tenantName)"
 $longtermResourceGroupName = "longterm-$($tenantName)"
 
