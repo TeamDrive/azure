@@ -44,24 +44,24 @@
             "address": "10.0.0.0/16",
             "subnet": {
                 "regserver": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').regserver)]",
-                    "address": "10.0.0.0/24",
-                    "nsgName": "[concat('nsg-', variables('tierName').regserver)]"
+                    "name": "[concat('subnet-', variables('tierName').regserver)]",
+                    "nsgName": "[concat('nsg-', variables('tierName').regserver)]",
+                    "address": "10.0.0.0/24"
                 },
                 "regserverdatabase": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').regserverdatabase)]",
-                    "address": "10.0.0.1/24",
-                    "nsgName": "[concat('nsg-', variables('tierName').regserverdatabase)]"
+                    "name": "[concat('subnet-', variables('tierName').regserverdatabase)]",
+                    "nsgName": "[concat('nsg-', variables('tierName').regserverdatabase)]",
+                    "address": "10.0.0.1/24"
                 },
                 "hostserver": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').hostserver)]",
-                    "address": "10.0.0.2/24",
-                    "nsgName": "[concat('nsg-', variables('tierName').hostserver)]"
+                    "name": "[concat('subnet-', variables('tierName').hostserver)]",
+                    "nsgName": "[concat('nsg-', variables('tierName').hostserver)]",
+                    "address": "10.0.0.2/24"
                 },
                 "webportal": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').webportal)]",
-                    "address": "10.0.0.3/24",
-                    "nsgName": "[concat('nsg-', variables('tierName').webportal)]"
+                    "name": "[concat('subnet-', variables('tierName').webportal)]",
+                    "nsgName": "[concat('nsg-', variables('tierName').webportal)]",
+                    "address": "10.0.0.3/24"
                 }
             }
         }

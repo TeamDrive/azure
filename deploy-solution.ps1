@@ -3,7 +3,6 @@ $branch = "master"
 $branch = "61e5be46b953d28746dd5bd670c9e36030da951b"
 $repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/$($branch)/"
 
-
 $tenantName = "saxony2"
 $resourceGroupName = "rg-$($tenantName)"
 $longtermResourceGroupName = "longterm-$($tenantName)"
@@ -23,8 +22,8 @@ $parameters=@{
 	}
 }
 
-git commit -am "."
-git push origin master
+# git commit -am "."
+# git push origin master
 
 New-AzureRmResourceGroup `
  	-Name $resourceGroupName `
