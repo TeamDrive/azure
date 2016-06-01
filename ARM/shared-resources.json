@@ -287,7 +287,6 @@
             "tags": { "displayName": "Virtual Network" },
             "dependsOn": [
                 "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.regserver.nsgName)]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.regserverdatabase.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.hostserver.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.webportal.nsgName)]"
             ],
@@ -304,15 +303,6 @@
                             "addressPrefix": "[variables('vnet').subnet.regserver.address]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserver.nsgName)]"
-                            }
-                        }
-                    },
-                    {
-                        "name": "[variables('vnet').subnet.regserverdatabase.name]",
-                        "properties": {
-                            "addressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserverdatabase.nsgName)]"
                             }
                         }
                     },
