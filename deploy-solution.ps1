@@ -1,7 +1,7 @@
 $location = "West Europe"
 $repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/master/"
 
-$tenantName = "saxony"
+$tenantName = "saxony2"
 $resourceGroupName = "rg-$($tenantName)"
 $longtermResourceGroupName = "longterm-$($tenantName)"
 
@@ -27,7 +27,7 @@ git push origin master
 # 	-Name $resourceGroupName `
 # 	-Location $location
 
-New-AzureRmResourceGroupDeployment `
+Test-AzureRmResourceGroupDeployment `
 	-ResourceGroupName $resourceGroupName `
 	-TemplateUri "$($repositoryUrl)/ARM/shared-resources.json" `
 	-TemplateParameterObject $parameters `

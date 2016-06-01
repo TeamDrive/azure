@@ -23,6 +23,12 @@
             "virtualMachines": "2015-06-15",
             "virtualMachineScaleSets": "2015-06-15"
         },
+        "tierName": {
+            "regserver": "regserver",
+            "hostserver": "hostserver",
+            "regserverdatabase": "regserverdatabase",
+            "webportal": "webportal"
+        },
         "publicIPs": {
             "regserver": "regserver",
             "hostserver": "hostserver",
@@ -33,36 +39,29 @@
             "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(variables('tenantName'), '-', variables('publicIPs').hostserver))]",
             "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(variables('tenantName'), '-', variables('publicIPs').webportal))]"
         },
-        "addressrange": {
-            "global": "10.0.0.0/16",
-            "regserver": "10.0.0.0/24",
-            "regserverdatabase": "10.0.0.1/24",
-            "hostserver": "10.0.0.2/24",
-            "webportal": "10.0.0.3/24"
-        },
         "vnet": {
             "name": "[concat(variables('tenantName'),'-vnet')]",
-            "address": "[variables('addressrange').global]",
+            "address": "10.0.0.0/16",
             "subnet": {
                 "regserver": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', 'regserver')]",
-                    "address": "[variables('addressrange').regserver]",
-                    "nsgName":  "regserver-nsg"
+                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').regserver')]",
+                    "address": "10.0.0.0/24",
+                    "nsgName": "['nsg-', variables('tierName').regserver)]"
                 },
                 "regserverdatabase": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', 'regserverdatabase')]",
-                    "address": "[variables('addressrange').regserverdatabase]",
-                    "nsgName": "regserver-db-nsg"
+                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').regserverdatabase)]",
+                    "address": "10.0.0.1/24",
+                    "nsgName": "['nsg-', variables('tierName').regserverdatabase)]"
                 },
                 "hostserver": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', 'hostserver')]",
-                    "address": "[variables('addressrange').hostserver]",
-                    "nsgName": "hostserver-nsg"
+                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').hostserver)]",
+                    "address": "10.0.0.2/24",
+                    "nsgName": "['nsg-', variables('tierName').hostserver)]"
                 },
                 "webportal": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', 'webportal')]",
-                    "address": "[variables('addressrange').webportal]",
-                    "nsgName": "portal-nsg"
+                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').webportal)]",
+                    "address": "10.0.0.3/24",
+                    "nsgName": "['nsg-', variables('tierName').webportal)]"
                 }
             }
         }
@@ -128,7 +127,7 @@
                             "protocol": "*",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.regserver.address]",
                             "destinationPortRange": "*"
                         }
                     }
@@ -280,23 +279,6 @@
                 ]
             }
         },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "[variables('apiVersions').virtualNetworks]",
@@ -309,7 +291,7 @@
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('addressrange').global]"
+                        "[variables('vnet').address]"
                     ]
                 },
                 "subnets": [
