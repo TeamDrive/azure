@@ -25,8 +25,8 @@
         },
         "tierName": {
             "regserver": "regserver",
-            "hostserver": "hostserver",
             "regserverdatabase": "regserverdatabase",
+            "hostserver": "hostserver",
             "webportal": "webportal"
         },
         "publicIPs": {
@@ -286,7 +286,10 @@
             "name": "[variables('vnet').name]",
             "tags": { "displayName": "Virtual Network" },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.regserver.nsgName)]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.regserver.nsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.regserverdatabase.nsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.hostserver.nsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.webportal.nsgName)]"
             ],
             "properties": {
                 "addressSpace": {
