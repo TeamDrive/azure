@@ -1,5 +1,8 @@
 $location = "West Europe"
-$repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/master/"
+$branch = "master"
+$branch = "61e5be46b953d28746dd5bd670c9e36030da951b"
+$repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/$($branch)/"
+
 
 $tenantName = "saxony2"
 $resourceGroupName = "rg-$($tenantName)"
