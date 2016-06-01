@@ -44,7 +44,7 @@
             "address": "10.0.0.0/16",
             "subnet": {
                 "regserver": {
-                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').regserver')]",
+                    "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').regserver)]",
                     "address": "10.0.0.0/24",
                     "nsgName": "['nsg-', variables('tierName').regserver)]"
                 },
