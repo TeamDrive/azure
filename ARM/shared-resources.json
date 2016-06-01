@@ -46,22 +46,22 @@
                 "regserver": {
                     "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').regserver)]",
                     "address": "10.0.0.0/24",
-                    "nsgName": "['nsg-', variables('tierName').regserver)]"
+                    "nsgName": "[concat('nsg-', variables('tierName').regserver)]"
                 },
                 "regserverdatabase": {
                     "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').regserverdatabase)]",
                     "address": "10.0.0.1/24",
-                    "nsgName": "['nsg-', variables('tierName').regserverdatabase)]"
+                    "nsgName": "[concat('nsg-', variables('tierName').regserverdatabase)]"
                 },
                 "hostserver": {
                     "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').hostserver)]",
                     "address": "10.0.0.2/24",
-                    "nsgName": "['nsg-', variables('tierName').hostserver)]"
+                    "nsgName": "[concat('nsg-', variables('tierName').hostserver)]"
                 },
                 "webportal": {
                     "name": "[concat(variables('tenantName'), '-subnet-', variables('tierName').webportal)]",
                     "address": "10.0.0.3/24",
-                    "nsgName": "['nsg-', variables('tierName').webportal)]"
+                    "nsgName": "[concat('nsg-', variables('tierName').webportal)]"
                 }
             }
         }
