@@ -86,7 +86,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "Internet",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.regserver.address]",
                             "destinationPortRange": "80"
                         }
                     },
@@ -100,7 +100,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "Internet",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.regserver.address]",
                             "destinationPortRange": "443"
                         }
                     },
@@ -110,40 +110,12 @@
                             "priority": 102,
                             "description": "Allow TCP/3306 MySQL to Database",
                             "access": "Allow",
-                            "direction": "Inbound",
+                            "direction": "Outbound",
                             "protocol": "Tcp",
-                            "sourceAddressPrefix": "[variables('addressrange').regserver]",
+                            "sourceAddressPrefix": "[variables('vnet').subnet.regserver.address]",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserverdatabase]",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
                             "destinationPortRange": "3306"
-                        }
-                    },
-                    {
-                        "name": "hostserver-http-in",
-                        "properties": {
-                            "priority": 103,
-                            "description": "Allow TCP/80 Inbound",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "Internet",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').hostserver]",
-                            "destinationPortRange": "80"
-                        }
-                    },
-                    {
-                        "name": "hostserver-https-in",
-                        "properties": {
-                            "priority": 104,
-                            "description": "Allow TCP/443 Inbound",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "Internet",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').hostserver]",
-                            "destinationPortRange": "443"
                         }
                     },
                     {
@@ -163,6 +135,168 @@
                 ]
             }
         },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('vnet').subnet.regserverdatabase.nsgName]",
+            "tags": { "displayName": "NetworkSecurityGroup RegServer Database" },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "regserver-to-regserverdatabase",
+                        "properties": {
+                            "priority": 102,
+                            "description": "Allow TCP/3306 MySQL to Database",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[variables('vnet').subnet.regserver.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
+                            "destinationPortRange": "3306"
+                        }
+                    },
+                    {
+                        "name": "block-everything",
+                        "properties": {
+                            "priority": 4096,
+                            "description": "Block all inbound traffic",
+                            "access": "Deny",
+                            "direction": "Inbound",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
+                            "destinationPortRange": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('vnet').subnet.hostserver.nsgName]",
+            "tags": { "displayName": "NetworkSecurityGroup HostServer" },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "hostserver-http-in",
+                        "properties": {
+                            "priority": 103,
+                            "description": "Allow TCP/80 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "hostserver-https-in",
+                        "properties": {
+                            "priority": 104,
+                            "description": "Allow TCP/443 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "destinationPortRange": "443"
+                        }
+                    },
+                    {
+                        "name": "block-everything",
+                        "properties": {
+                            "priority": 4096,
+                            "description": "Block all inbound traffic",
+                            "access": "Deny",
+                            "direction": "Inbound",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "destinationPortRange": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('vnet').subnet.webportal.nsgName]",
+            "tags": { "displayName": "NetworkSecurityGroup PortalServer" },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "hostserver-http-in",
+                        "properties": {
+                            "priority": 103,
+                            "description": "Allow TCP/80 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "hostserver-https-in",
+                        "properties": {
+                            "priority": 104,
+                            "description": "Allow TCP/443 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "destinationPortRange": "443"
+                        }
+                    },
+                    {
+                        "name": "block-everything",
+                        "properties": {
+                            "priority": 4096,
+                            "description": "Block all inbound traffic",
+                            "access": "Deny",
+                            "direction": "Inbound",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "destinationPortRange": "*"
+                        }
+                    }
+                ]
+            }
+        },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "[variables('apiVersions').virtualNetworks]",
@@ -185,6 +319,33 @@
                             "addressPrefix": "[variables('vnet').subnet.regserver.address]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserver.nsgName)]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('vnet').subnet.regserverdatabase.name]",
+                        "properties": {
+                            "addressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserverdatabase.nsgName)]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('vnet').subnet.hostserver.name]",
+                        "properties": {
+                            "addressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.hostserver.nsgName)]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('vnet').subnet.webportal.name]",
+                        "properties": {
+                            "addressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.webportal.nsgName)]"
                             }
                         }
                     }
