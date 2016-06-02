@@ -44,6 +44,13 @@
         }
     },
     "variables": {
+        "tierName": {
+            "regserver": "regserver",
+            "regserverdatabase": "regserverdatabase",
+            "hostserver": "hostserver",
+            "webportal": "webportal",
+            "jumphost": "jumphost"
+        },
         "commonSettings": {
             "constants": {
                 "apiVersions": {
@@ -75,6 +82,11 @@
                 "name": "[concat(parameters('tenantName'),'-vnet')]",
                 "address": "10.0.0.0/16",
                 "subnet": {
+                    "jumphost": {
+                        "name": "[concat('subnet-', variables('tierName').jumphost)]",
+                        "nsgName": "[concat('nsg-', variables('tierName').jumphost)]",
+                        "address": "10.0.0.0/24"
+                    },
                     "regserver": {
                         "name": "[concat('subnet-', variables('tierName').regserver)]",
                         "nsgName": "[concat('nsg-', variables('tierName').regserver)]",
@@ -114,12 +126,6 @@
                     "webportal": "Standard_A1"
                 }
             }
-        },
-        "tierName": {
-            "regserver": "regserver",
-            "regserverdatabase": "regserverdatabase",
-            "hostserver": "hostserver",
-            "webportal": "webportal"
         }
     },
     "resources": [

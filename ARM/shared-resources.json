@@ -9,6 +9,45 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
+            "name": "[parameters('commonSettings').vnet.subnet.jumphost.nsgName]",
+            "tags": { "displayName": "NetworkSecurityGroup RegServer" },
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "jumphost-ssh-in",
+                        "properties": {
+                            "priority": 100,
+                            "description": "Allow TCP/22 Inbound",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "Internet",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.jumphost.address]",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
+                        "name": "block-everything",
+                        "properties": {
+                            "priority": 4096,
+                            "description": "Block all inbound traffic",
+                            "access": "Deny",
+                            "direction": "Inbound",
+                            "protocol": "*",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.jumphost.address]",
+                            "destinationPortRange": "*"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkSecurityGroups]",
+            "location": "[resourceGroup().location]",
             "name": "[parameters('commonSettings').vnet.subnet.regserver.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup RegServer" },
             "properties": {
@@ -56,6 +95,20 @@
                         }
                     },
                     {
+                        "name": "ssh-from-jumphost",
+                        "properties": {
+                            "priority": 200,
+                            "description": "Allow TCP/22 jumphost",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.jumphost.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
                         "name": "block-everything",
                         "properties": {
                             "priority": 4096,
@@ -92,6 +145,20 @@
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
                             "destinationPortRange": "3306"
+                        }
+                    },
+                    {
+                        "name": "ssh-from-jumphost",
+                        "properties": {
+                            "priority": 200,
+                            "description": "Allow TCP/22 jumphost",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.jumphost.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
+                            "destinationPortRange": "22"
                         }
                     },
                     {
@@ -148,6 +215,20 @@
                         }
                     },
                     {
+                        "name": "ssh-from-jumphost",
+                        "properties": {
+                            "priority": 200,
+                            "description": "Allow TCP/22 jumphost",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.jumphost.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.hostserver.address]",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
                         "name": "block-everything",
                         "properties": {
                             "priority": 4096,
@@ -201,6 +282,20 @@
                         }
                     },
                     {
+                        "name": "ssh-from-jumphost",
+                        "properties": {
+                            "priority": 200,
+                            "description": "Allow TCP/22 jumphost",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.jumphost.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.webportal.address]",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
                         "name": "block-everything",
                         "properties": {
                             "priority": 4096,
@@ -224,6 +319,7 @@
             "name": "[parameters('commonSettings').vnet.name]",
             "tags": { "displayName": "Virtual Network" },
             "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.jumphost.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.regserver.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.hostserver.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.webportal.nsgName)]"
@@ -235,6 +331,15 @@
                     ]
                 },
                 "subnets": [
+                    {
+                        "name": "[parameters('commonSettings').vnet.subnet.jumphost.name]",
+                        "properties": {
+                            "addressPrefix": "[parameters('commonSettings').vnet.subnet.jumphost.address]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('commonSettings').vnet.subnet.jumphost.nsgName)]"
+                            }
+                        }
+                    },
                     {
                         "name": "[parameters('commonSettings').vnet.subnet.regserver.name]",
                         "properties": {

@@ -1,4 +1,4 @@
-$tenantName = "saxony10"
+$tenantName = "saxony11"
 $location = "West Europe"
 
 $githubUser = "chgeuer"
