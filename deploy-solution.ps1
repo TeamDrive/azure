@@ -30,10 +30,11 @@ New-AzureRmResourceGroup `
  	-Location $commonSettings['location'] `
 	-Force
 
+#	-TemplateParameterObject @{ commonSettings=$commonSettings } `
 $deploymentResult = New-AzureRmResourceGroupDeployment `
 	-ResourceGroupName $commonSettings['resourceGroupName'] `
 	-TemplateUri "$($repositoryUrl)/ARM/azuredeploy.json" `
-	-TemplateParameterObject @{ commonSettings=$commonSettings } `
+	-TemplateParameterObject $commonSettings `
 	-Mode Complete  `
 	-Force `
 	-Verbose
