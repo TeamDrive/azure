@@ -1,0 +1,47 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": { "commonSettings": { "type": "object" } },
+    "resources": [
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.publicIPAddresses]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-', 'jumphost')]",
+            "tags": {
+                "displayName": "Public IP Jumphost",
+                "tenantName": "[parameters('commonSettings').tenantName]"
+            },
+            "properties": {
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(parameters('commonSettings').tenantName, '-', 'jumphost')]"
+                },
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkInterfaces]",
+            "location": "[resourceGroup().location]",
+            "name": "testnic",
+            "tags": { "displayName": "Jump Host - Network Interface Card" },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig-jumphost",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "10.0.0.10",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('commonSettings').tenantName, '-', 'jumphost'))]",
+                            },
+                            "subnet": {
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.jumphost.name)]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
