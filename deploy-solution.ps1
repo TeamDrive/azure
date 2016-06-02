@@ -1,4 +1,4 @@
-$tenantName = "saxony3"
+$tenantName = "saxony5"
 $location="West Europe"
 
 $authorizedKeyFilename = "C:\Users\chgeuer\puttykeys\authorizedkeys.txt"

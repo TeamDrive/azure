@@ -76,27 +76,33 @@
                 "address": "10.0.0.0/16",
                 "subnet": {
                     "regserver": {
-                        "name": "subnet-regserver",
-                        "nsgName": "nsg-regserver",
+                        "name": "[concat('subnet-', variables('tierName').regserver)]",
+                        "nsgName": "[concat('nsg-', variables('tierName').regserver)]",
                         "address": "10.0.1.0/24"
                     },
                     "regserverdatabase": {
-                        "name": "subnet-regserverdatabase",
-                        "nsgName": "nsg-regserverdatabase",
+                        "name": "[concat('subnet-', variables('tierName').regserverdatabase)]",
+                        "nsgName": "[concat('nsg-', variables('tierName').regserverdatabase)]",
                         "address": "10.0.2.0/24"
                     },
                     "hostserver": {
-                        "name": "subnet-hostserver",
-                        "nsgName": "nsg-hostserver",
+                        "name": "[concat('subnet-', variables('tierName').hostserver)]",
+                        "nsgName": "[concat('nsg-', variables('tierName').hostserver)]",
                         "address": "10.0.3.0/24"
                     },
                     "webportal": {
-                        "name": "subnet-webportal",
-                        "nsgName": "nsg-webportal",
+                        "name": "[concat('subnet-', variables('tierName').webportal)]",
+                        "nsgName": "[concat('nsg-', variables('tierName').webportal)]",
                         "address": "10.0.4.0/24"
                     }
                 }
             }
+        },
+        "tierName": {
+            "regserver": "regserver",
+            "regserverdatabase": "regserverdatabase",
+            "hostserver": "hostserver",
+            "webportal": "webportal"
         }
     },
     "resources": [
