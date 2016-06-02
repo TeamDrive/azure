@@ -98,7 +98,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
             "name": "networkSecurityGroup",
             "tags": { "displayName": "NetworkSecurityGroup" },
@@ -193,7 +193,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "[variables('apiVersions').virtualNetworks]",
+            "apiVersion": "[variables('constants').apiVersions.virtualNetworks]",
             "location": "[resourceGroup().location]",
             "name": "[variables('vnet').name]",
             "tags": { "displayName": "Virtual Network" },
@@ -221,7 +221,7 @@
         },
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "[variables('apiVersions').networkInterfaces]",
+            "apiVersion": "[variables('constants').apiVersions.networkInterfaces]",
             "location": "[resourceGroup().location]",
             "name": "[concat('nic-', variables('suffix').jumphost)]",
             "tags": { "displayName": "Jump Host - Network Interface Card" },
@@ -249,7 +249,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "[variables('apiVersions').storageAccounts]",
+            "apiVersion": "[variables('constants').apiVersions.storageAccounts]",
             "location": "[resourceGroup().location]",
             "name": "[concat(variables('storageAccountPrefix')[copyIndex()], variables('newStorageAccountSuffix'))]",
             "tags": { "displayName": "Storage Accounts - VM ScaleSet" },
@@ -265,7 +265,7 @@
             "type": "Microsoft.Network/loadBalancers",
             "name": "myLoadbalancerName",
             "location": "[resourceGroup().location]",
-            "apiVersion": "[variables('apiVersions').loadBalancers]",
+            "apiVersion": "[variables('constants').apiVersions.loadBalancers]",
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', variables('vnet').name)]",
                 "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPs').web)]"
@@ -318,7 +318,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "[variables('apiVersions').virtualMachineScaleSets]",
+            "apiVersion": "[variables('constants').apiVersions.virtualMachineScaleSets]",
             "location": "[resourceGroup().location]",
             "name": "[concat(parameters('tenantName'),'-webs')]",
             "dependsOn": [

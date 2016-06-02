@@ -1,17 +1,21 @@
-$location = "West Europe"
-$repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/master/"
-
 $tenantName = "saxony"
-$resourceGroupName = "rg-$($tenantName)"
+$location = "West Europe"
+
+$githubUser = "chgeuer"
+$githubProject = "td"
+
+$_ignore = & git commit -am "." -q
+$branch =  & git rev-parse HEAD
+$repositoryUrl = "https://raw.githubusercontent.com/$($githubUser)/$($githubProject)/$($branch)/"
+
+Write-Host "Pusing to '$($repositoryUrl)'"
+$_ignore = & git push origin master -q
+
 $longtermResourceGroupName = "longterm-$($tenantName)"
 
 $parameters=@{
 	tenantName=$tenantName
-	longtermResourceGroupName=$longtermResourceGroupName
 }
-
-git commit -am "."
-git push origin master
 
 New-AzureRmResourceGroup `
 	-Name $longtermResourceGroupName `
@@ -23,6 +27,7 @@ New-AzureRmResourceGroupDeployment `
 	-TemplateParameterObject $parameters `
 	-Mode Complete  `
 	-Verbose
+
 
 
 

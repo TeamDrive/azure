@@ -10,57 +10,54 @@
         }
     },
     "variables": {
+        "constants": {
+            "apiVersions": {
+                "storageAccounts": "2015-06-15",
+                "networkSecurityGroups": "2015-06-15",
+                "loadBalancers": "2016-03-30",
+                "virtualNetworks": "2015-06-15",
+                "publicIPAddresses": "2015-06-15",
+                "networkInterfaces": "2015-06-15",
+                "virtualMachines": "2015-06-15",
+                "virtualMachineScaleSets": "2015-06-15"
+            },
+            "tierName": {
+                "regserver": "regserver",
+                "regserverdatabase": "regserverdatabase",
+                "hostserver": "hostserver",
+                "webportal": "webportal"
+            },
+            "publicIPs": {
+                "regserver": "regserver",
+                "hostserver": "hostserver",
+                "webportal": "webportal"
+            }
+        },
         "tenantName": "[parameters('commonSettings').tenantName]",
         "longtermResourceGroupName": "[parameters('commonSettings').longtermResourceGroupName]",
         "repositoryUrl": "[parameters('commonSettings').repositoryUrl]",
-        "apiVersions": {
-            "storageAccounts": "2015-06-15",
-            "networkSecurityGroups": "2015-06-15",
-            "loadBalancers": "2016-03-30",
-            "virtualNetworks": "2015-06-15",
-            "publicIPAddresses": "2015-06-15",
-            "networkInterfaces": "2015-06-15",
-            "virtualMachines": "2015-06-15",
-            "virtualMachineScaleSets": "2015-06-15"
-        },
-        "tierName": {
-            "regserver": "regserver",
-            "regserverdatabase": "regserverdatabase",
-            "hostserver": "hostserver",
-            "webportal": "webportal"
-        },
-        "publicIPs": {
-            "regserver": "regserver",
-            "hostserver": "hostserver",
-            "webportal": "webportal"
-        },
-        "ipAddressId": {
-            "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(variables('tenantName'), '-', variables('publicIPs').regserver))]",
-            "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(variables('tenantName'), '-', variables('publicIPs').hostserver))]",
-            "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', variables('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(variables('tenantName'), '-', variables('publicIPs').webportal))]"
-        },
         "vnet": {
             "name": "[concat(variables('tenantName'),'-vnet')]",
             "address": "10.0.0.0/16",
             "subnet": {
                 "regserver": {
-                    "name": "[concat('subnet-', variables('tierName').regserver)]",
-                    "nsgName": "[concat('nsg-', variables('tierName').regserver)]",
+                    "name": "[concat('subnet-', variables('constants').tierName.regserver)]",
+                    "nsgName": "[concat('nsg-', variables('constants').tierName.regserver)]",
                     "address": "10.0.1.0/24"
                 },
                 "regserverdatabase": {
-                    "name": "[concat('subnet-', variables('tierName').regserverdatabase)]",
-                    "nsgName": "[concat('nsg-', variables('tierName').regserverdatabase)]",
+                    "name": "[concat('subnet-', variables('constants').tierName.regserverdatabase)]",
+                    "nsgName": "[concat('nsg-', variables('constants').tierName.regserverdatabase)]",
                     "address": "10.0.2.0/24"
                 },
                 "hostserver": {
-                    "name": "[concat('subnet-', variables('tierName').hostserver)]",
-                    "nsgName": "[concat('nsg-', variables('tierName').hostserver)]",
+                    "name": "[concat('subnet-', variables('constants').tierName.hostserver)]",
+                    "nsgName": "[concat('nsg-', variables('constants').tierName.hostserver)]",
                     "address": "10.0.3.0/24"
                 },
                 "webportal": {
-                    "name": "[concat('subnet-', variables('tierName').webportal)]",
-                    "nsgName": "[concat('nsg-', variables('tierName').webportal)]",
+                    "name": "[concat('subnet-', variables('constants').tierName.webportal)]",
+                    "nsgName": "[concat('nsg-', variables('constants').tierName.webportal)]",
                     "address": "10.0.4.0/24"
                 }
             }
@@ -69,7 +66,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
             "name": "[variables('vnet').subnet.regserver.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup RegServer" },
@@ -136,7 +133,7 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
             "name": "[variables('vnet').subnet.regserverdatabase.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup RegServer Database" },
@@ -175,7 +172,7 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
             "name": "[variables('vnet').subnet.hostserver.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup HostServer" },
@@ -228,7 +225,7 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
+            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
             "name": "[variables('vnet').subnet.webportal.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup PortalServer" },
@@ -281,7 +278,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "[variables('apiVersions').virtualNetworks]",
+            "apiVersion": "[variables('constants').apiVersions.virtualNetworks]",
             "location": "[resourceGroup().location]",
             "name": "[variables('vnet').name]",
             "tags": { "displayName": "Virtual Network" },

@@ -44,25 +44,28 @@
         }
     },
     "variables": {
-        "apiVersions": {
-            "storageAccounts": "2015-06-15",
-            "networkSecurityGroups": "2015-06-15",
-            "loadBalancers": "2016-03-30",
-            "virtualNetworks": "2015-06-15",
-            "publicIPAddresses": "2015-06-15",
-            "networkInterfaces": "2015-06-15",
-            "virtualMachines": "2015-06-15",
-            "virtualMachineScaleSets": "2015-06-15"
-        },
-        "publicIPs": {
-            "regserver": "regserver",
-            "hostserver": "hostserver",
-            "webportal": "webportal"
-        },
-        "ipAddressId": {
-            "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').regserver))]",
-            "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
-            "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
+        "constants": {
+            "apiVersions": {
+                "storageAccounts": "2015-06-15",
+                "networkSecurityGroups": "2015-06-15",
+                "loadBalancers": "2016-03-30",
+                "virtualNetworks": "2015-06-15",
+                "publicIPAddresses": "2015-06-15",
+                "networkInterfaces": "2015-06-15",
+                "virtualMachines": "2015-06-15",
+                "virtualMachineScaleSets": "2015-06-15"
+            },
+            "tierName": {
+                "regserver": "regserver",
+                "regserverdatabase": "regserverdatabase",
+                "hostserver": "hostserver",
+                "webportal": "webportal"
+            },
+            "publicIPs": {
+                "regserver": "regserver",
+                "hostserver": "hostserver",
+                "webportal": "webportal"
+            }
         },
         "commonSettings": {
             "tenantName": "[parameters('tenantName')]",
@@ -72,7 +75,12 @@
             "deployRegServer": "[parameters('deployRegServer')]",
             "regServerInstanceCount": "[parameters('regServerInstanceCount')]",
             "deployPortalServer": "[parameters('deployPortalServer')]",
-            "repositoryUrl": "[parameters('repositoryUrl')]"
+            "repositoryUrl": "[parameters('repositoryUrl')]",
+            "ipAddressId": {
+                "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').regserver))]",
+                "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
+                "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
+            }
         }
     },
     "resources": [

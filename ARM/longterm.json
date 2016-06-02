@@ -29,7 +29,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "[variables('apiVersions').publicIPAddresses]",
+            "apiVersion": "[variables('constants').apiVersions.publicIPAddresses]",
             "location": "[resourceGroup().location]",
             "name": "[concat(parameters('tenantName'), '-', variables('publicIPs').regserver)]",
             "tags": {
@@ -46,7 +46,7 @@
         },
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "[variables('apiVersions').publicIPAddresses]",
+            "apiVersion": "[variables('constants').apiVersions.publicIPAddresses]",
             "location": "[resourceGroup().location]",
             "name": "[concat(parameters('tenantName'), '-', variables('publicIPs').hostserver)]",
             "tags": {
@@ -63,7 +63,7 @@
         },
         {
             "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "[variables('apiVersions').publicIPAddresses]",
+            "apiVersion": "[variables('constants').apiVersions.publicIPAddresses]",
             "location": "[resourceGroup().location]",
             "name": "[concat(parameters('tenantName'), '-', variables('publicIPs').webportal)]",
             "tags": {
@@ -80,7 +80,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "[variables('apiVersions').storageAccounts]",
+            "apiVersion": "[variables('constants').apiVersions.storageAccounts]",
             "location": "[resourceGroup().location]",
             "name": "[concat(parameters('tenantName'), 'storage')]",
             "tags": { "displayName": "Storage Account - Object Storage" },
