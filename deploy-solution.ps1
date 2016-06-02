@@ -9,7 +9,7 @@ $repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/$($branch)/"
 
 Write-Host "The repo base URL is '$($repositoryUrl)'"
 
-$tenantName = "saxony7"
+$tenantName = "saxony8"
 $location = "West Europe"
 $resourceGroupName = "rg-$($tenantName)"
 $longtermResourceGroupName = "longterm-$($tenantName)"

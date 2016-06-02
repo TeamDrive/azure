@@ -51,17 +51,17 @@
                 "regserverdatabase": {
                     "name": "[concat('subnet-', variables('tierName').regserverdatabase)]",
                     "nsgName": "[concat('nsg-', variables('tierName').regserverdatabase)]",
-                    "address": "10.0.0.1/24"
+                    "address": "10.0.1.0/24"
                 },
                 "hostserver": {
                     "name": "[concat('subnet-', variables('tierName').hostserver)]",
                     "nsgName": "[concat('nsg-', variables('tierName').hostserver)]",
-                    "address": "10.0.0.2/24"
+                    "address": "10.0.2.0/24"
                 },
                 "webportal": {
                     "name": "[concat('subnet-', variables('tierName').webportal)]",
                     "nsgName": "[concat('nsg-', variables('tierName').webportal)]",
-                    "address": "10.0.0.3/24"
+                    "address": "10.0.3.0/24"
                 }
             }
         }
@@ -307,12 +307,29 @@
                         }
                     },
                     {
-                        "name": "subnet-regserverdatabase",
+                        "name": "[variables('vnet').subnet.regserverdatabase.name]",
                         "properties": {
-                            "provisioningState": "Succeeded",
-                            "addressPrefix": "10.0.1.0/24",
+                            "addressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserverdatabase.nsgName)]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('vnet').subnet.hostserver.name]",
+                        "properties": {
+                            "addressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.hostserver.nsgName)]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('vnet').subnet.webportal.name]",
+                        "properties": {
+                            "addressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.webportal.nsgName)]"
                             }
                         }
                     }
