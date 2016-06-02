@@ -9,9 +9,6 @@
             "location": "[resourceGroup().location]",
             "name": "testnic",
             "tags": { "displayName": "Jump Host - Network Interface Card" },
-            "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name)]"
-            ],
             "properties": {
                 "ipConfigurations": [
                     {
