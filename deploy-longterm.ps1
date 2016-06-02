@@ -27,7 +27,7 @@ New-AzureRmResourceGroupDeployment `
 	-TemplateUri "$($repositoryUrl)/ARM/longterm.json" `
 	-TemplateParameterObject $parameters `
 	-Mode Complete  `
-	-Verbose`
+	-Verbose `
 	-Force
 
 
