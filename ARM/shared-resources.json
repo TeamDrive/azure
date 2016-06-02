@@ -305,6 +305,16 @@
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserver.nsgName)]"
                             }
                         }
+                    },
+                    {
+                        "name": "subnet-regserverdatabase",
+                        "properties": {
+                            "provisioningState": "Succeeded",
+                            "addressPrefix": "10.0.1.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserverdatabase.nsgName)]"
+                            }
+                        }
                     }
                 ]
             }
