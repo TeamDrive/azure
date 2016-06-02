@@ -7,6 +7,10 @@ git push origin master
 $branch = "master"
 $branch =  & git rev-parse HEAD
 
+Write-Host "The revision is \"$($branch)\""
+
+return
+
 $tenantName = "saxony6"
 $location = "West Europe"
 $resourceGroupName = "rg-$($tenantName)"
