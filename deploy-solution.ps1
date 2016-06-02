@@ -5,7 +5,7 @@ $githubUser = "chgeuer"
 $githubProject = "td"
 
 $_ignore = & git commit -am "."
-$_ignore = & git push origin master
+$_ignore = & git push origin master -q
 
 if ($_ignore.Contains("Writing objects")) {
 	Write-Host "Pushed to github"
