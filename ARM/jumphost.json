@@ -23,8 +23,11 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkInterfaces]",
             "location": "[resourceGroup().location]",
-            "name": "testnic",
+            "name": "nic-jumphost",
             "tags": { "displayName": "Jump Host - Network Interface Card" },
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', concat(parameters('commonSettings').tenantName, '-', 'jumphost'))]"
+            ],
             "properties": {
                 "ipConfigurations": [
                     {
@@ -33,7 +36,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "10.0.0.10",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('commonSettings').tenantName, '-', 'jumphost'))]",
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('commonSettings').tenantName, '-', 'jumphost'))]"
                             },
                             "subnet": {
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.jumphost.name)]"
