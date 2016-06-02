@@ -12,9 +12,10 @@ $repositoryUrl = "https://raw.githubusercontent.com/$($githubUser)/$($githubProj
 Write-Host "Pusing to '$($repositoryUrl)'"
 $_ignore = & git push origin master -q
 
+$location="West Europe"
+$resourceGroupName="rg-$($tenantName)"
+
 $commonSettings = @{
-	location="West Europe"
-	resourceGroupName="rg-$($tenantName)"
 	tenantName=$tenantName
 	adminUsername=$env:USERNAME.ToLower()
 	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
@@ -26,13 +27,13 @@ $commonSettings = @{
 }
 
 New-AzureRmResourceGroup `
- 	-Name $commonSettings['resourceGroupName'] `
- 	-Location $commonSettings['location'] `
+ 	-Name $resourceGroupName `
+ 	-Location $location `
 	-Force
 
 #	-TemplateParameterObject @{ commonSettings=$commonSettings } `
 $deploymentResult = New-AzureRmResourceGroupDeployment `
-	-ResourceGroupName $commonSettings['resourceGroupName'] `
+	-ResourceGroupName $resourceGroupName `
 	-TemplateUri "$($repositoryUrl)/ARM/azuredeploy.json" `
 	-TemplateParameterObject $commonSettings `
 	-Mode Complete  `
