@@ -69,7 +69,6 @@
             }
         },
         "commonSettings": {
-            "constants": "[variables('constants')]",
             "tenantName": "[parameters('tenantName')]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminSecureShellKey": "[parameters('adminSecureShellKey')]",
