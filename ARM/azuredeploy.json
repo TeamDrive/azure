@@ -44,31 +44,20 @@
         }
     },
     "variables": {
-        "constants": {
-            "apiVersions": {
-                "storageAccounts": "2015-06-15",
-                "networkSecurityGroups": "2015-06-15",
-                "loadBalancers": "2016-03-30",
-                "virtualNetworks": "2015-06-15",
-                "publicIPAddresses": "2015-06-15",
-                "networkInterfaces": "2015-06-15",
-                "virtualMachines": "2015-06-15",
-                "virtualMachineScaleSets": "2015-06-15",
-                "deployments": "2015-01-01"
-            },
-            "tierName": {
-                "regserver": "regserver",
-                "regserverdatabase": "regserverdatabase",
-                "hostserver": "hostserver",
-                "webportal": "webportal"
-            },
-            "publicIPs": {
-                "regserver": "regserver",
-                "hostserver": "hostserver",
-                "webportal": "webportal"
-            }
-        },
         "commonSettings": {
+            "constants": {
+                "apiVersions": {
+                    "storageAccounts": "2015-06-15",
+                    "networkSecurityGroups": "2015-06-15",
+                    "loadBalancers": "2016-03-30",
+                    "virtualNetworks": "2015-06-15",
+                    "publicIPAddresses": "2015-06-15",
+                    "networkInterfaces": "2015-06-15",
+                    "virtualMachines": "2015-06-15",
+                    "virtualMachineScaleSets": "2015-06-15",
+                    "deployments": "2015-01-01"
+                }
+            },
             "tenantName": "[parameters('tenantName')]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminSecureShellKey": "[parameters('adminSecureShellKey')]",
@@ -78,32 +67,32 @@
             "deployPortalServer": "[parameters('deployPortalServer')]",
             "repositoryUrl": "[parameters('repositoryUrl')]",
             "ipAddressId": {
-                "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('constants').publicIPs.regserver))]",
-                "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('constants').publicIPs.hostserver))]",
-                "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('constants').publicIPs.webportal))]"
+                "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-regserver'))]",
+                "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-hostserver'))]",
+                "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-webportal'))]"
             },
             "vnet": {
                 "name": "[concat(parameters('tenantName'),'-vnet')]",
                 "address": "10.0.0.0/16",
                 "subnet": {
                     "regserver": {
-                        "name": "[concat('subnet-', variables('commonSettings').constants.tierName.regserver)]",
-                        "nsgName": "[concat('nsg-', variables('commonSettings').constants.tierName.regserver)]",
+                        "name": "subnet-regserver",
+                        "nsgName": "nsg-regserver",
                         "address": "10.0.1.0/24"
                     },
                     "regserverdatabase": {
-                        "name": "[concat('subnet-', variables('commonSettings').constants.tierName.regserverdatabase)]",
-                        "nsgName": "[concat('nsg-', variables('commonSettings').constants.tierName.regserverdatabase)]",
+                        "name": "subnet-regserverdatabase",
+                        "nsgName": "nsg-regserverdatabase",
                         "address": "10.0.2.0/24"
                     },
                     "hostserver": {
-                        "name": "[concat('subnet-', variables('commonSettings').constants.tierName.hostserver)]",
-                        "nsgName": "[concat('nsg-', variables('commonSettings').constants.tierName.hostserver)]",
+                        "name": "subnet-hostserver",
+                        "nsgName": "nsg-hostserver",
                         "address": "10.0.3.0/24"
                     },
                     "webportal": {
-                        "name": "[concat('subnet-', variables('commonSettings').constants.tierName.webportal)]",
-                        "nsgName": "[concat('nsg-', variables('commonSettings').constants.tierName.webportal)]",
+                        "name": "subnet-webportal",
+                        "nsgName": "nsg-webportal",
                         "address": "10.0.4.0/24"
                     }
                 }
