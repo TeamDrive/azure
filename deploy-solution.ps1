@@ -17,7 +17,7 @@ $repositoryUrl = "https://raw.githubusercontent.com/$($githubUser)/$($githubProj
 
 Write-Host "The repo base URL is '$($repositoryUrl)'"
 
-$tenantName = "saxony8"
+$tenantName = "saxony9"
 $location = "West Europe"
 $resourceGroupName = "rg-$($tenantName)"
 $longtermResourceGroupName = "longterm-$($tenantName)"
@@ -28,7 +28,7 @@ $parameters=@{
 		tenantName=$tenantName
 		longtermResourceGroupName=$longtermResourceGroupName
 		adminUsername=$env:USERNAME.ToLower()
-		adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename)
+		adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
 		regServerInstanceCount=2
 		deployRegServer="Enabled"
 		deployPortalServer="Enabled"
@@ -41,10 +41,12 @@ New-AzureRmResourceGroup `
  	-Location $location `
 	-Force
 
-New-AzureRmResourceGroupDeployment `
+$deploymentResult = New-AzureRmResourceGroupDeployment `
 	-ResourceGroupName $resourceGroupName `
 	-TemplateUri "$($repositoryUrl)/ARM/shared-resources.json" `
 	-TemplateParameterObject $parameters `
 	-Mode Complete  `
 	-Force `
 	-Verbose
+
+Write-Host "Deployment to $($resourceGroupName) is $($deploymentResult.ProvisioningState)"
