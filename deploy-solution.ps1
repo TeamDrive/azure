@@ -1,5 +1,5 @@
 
-$tenantName = "saxony11"
+$tenantName = "saxony12"
 
 
 # $sshkey = "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAklvcJCA1K82mjlxM1ZHP1PF7eqKZ5KcmxLeNSJ7vMLD1/XUMZ667P2Ep7iu/J4Ci4u6V4LyYDodhRRFZaaxMFHTUVTwcApuh0fl4UJY/Evd6R+A66zxG8oSG75KQTiOYsV4cZ1PnMfg1Y014n814VGKd68ZHKc2KQFLGfsBZ7Hqc2NIU1Y0AxNaeHG8i9FlhSSCDuk/Lyh3o+vJl3GKFMezua5+rFG+H8wPSCN9tkrf+zpW1ynyXC+xEn9eenLcryyqa9G2MYR1FgClxLTgZzAHYCnmMgsMxxvMVOlI6nLS3sFh4+14j8wgPbv4TzH3AI7PxcGbOvWGvlTsLRL/nmQ=="
@@ -14,14 +14,11 @@ $repositoryUrl = "https://raw.githubusercontent.com/$($githubUser)/$($githubProj
 Write-Host "Pusing to '$($repositoryUrl)'"
 $_ignore = & git push origin master -q
 
-$location = "West Europe"
-$resourceGroupName = "rg-$($tenantName)"
-$longtermResourceGroupName = "longterm-$($tenantName)"
-
-
 $commonSettings = @{
+	location="West Europe"
 	tenantName=$tenantName
-	longtermResourceGroupName=$longtermResourceGroupName
+	resourceGroupName="rg-$($tenantName)"
+	longtermResourceGroupName="longterm-$($tenantName)"
 	adminUsername=$env:USERNAME.ToLower()
 	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
 	deployRegServer="Enabled"
@@ -31,16 +28,16 @@ $commonSettings = @{
 }
 
 New-AzureRmResourceGroup `
- 	-Name $resourceGroupName `
- 	-Location $location `
+ 	-Name $commonSettings['resourceGroupName'] `
+ 	-Location $commonSettings['location'] `
 	-Force
 
 $deploymentResult = New-AzureRmResourceGroupDeployment `
-	-ResourceGroupName $resourceGroupName `
+	-ResourceGroupName $commonSettings['resourceGroupName'] `
 	-TemplateUri "$($repositoryUrl)/ARM/shared-resources.json" `
 	-TemplateParameterObject @{ commonSettings=$commonSettings } `
 	-Mode Complete  `
 	-Force `
 	-Verbose
 
-Write-Host "Deployment to $($resourceGroupName) is $($deploymentResult.ProvisioningState)"
+Write-Host "Deployment to $($commonSettings['resourceGroupName']) is $($deploymentResult.ProvisioningState)"
