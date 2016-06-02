@@ -1,13 +1,13 @@
 
-$repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/$($branch)/"
 
 git commit -am "."
 git push origin master
 
 $branch = "master"
 $branch =  & git rev-parse HEAD
+$repositoryUrl = "https://raw.githubusercontent.com/chgeuer/td/$($branch)/"
 
-Write-Host "The revision is '$($branch)'"
+Write-Host "The repo base URL is '$($repositoryUrl)'"
 
 return
 
