@@ -15,10 +15,6 @@
             "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAklvcJCA1K82mjlxM1ZHP1PF7eqKZ5KcmxLeNSJ7vMLD1/XUMZ667P2Ep7iu/J4Ci4u6V4LyYDodhRRFZaaxMFHTUVTwcApuh0fl4UJY/Evd6R+A66zxG8oSG75KQTiOYsV4cZ1PnMfg1Y014n814VGKd68ZHKc2KQFLGfsBZ7Hqc2NIU1Y0AxNaeHG8i9FlhSSCDuk/Lyh3o+vJl3GKFMezua5+rFG+H8wPSCN9tkrf+zpW1ynyXC+xEn9eenLcryyqa9G2MYR1FgClxLTgZzAHYCnmMgsMxxvMVOlI6nLS3sFh4+14j8wgPbv4TzH3AI7PxcGbOvWGvlTsLRL/nmQ==",
             "metadata": { "description": "Admin SSH key for the Virtual Machines." }
         },
-        "regServerInstanceCount": {
-            "type": "int",
-            "defaultValue": 2
-        },
         "longtermResourceGroupName": {
             "type": "string"
         },
@@ -29,6 +25,10 @@
                 "Enabled",
                 "Disabled"
             ]
+        },
+        "regServerInstanceCount": {
+            "type": "int",
+            "defaultValue": 2
         },
         "deployPortalServer": {
             "type": "string",
@@ -44,11 +44,6 @@
         }
     },
     "variables": {
-        "commonSettings": {
-
-        },
-        "repositoryUrl": "[parameters('repositoryUrl')]",
-        "templateBaseUrl": "[parameters('repositoryUrl')]",
         "apiVersions": {
             "storageAccounts": "2015-06-15",
             "networkSecurityGroups": "2015-06-15",
@@ -69,178 +64,36 @@
             "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').hostserver))]",
             "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('publicIPs').webportal))]"
         },
-        "newStorageAccountSuffix": "[concat(parameters('tenantName'), 'vmss')]",
-        "storageAccountPrefix": [ "a", "g", "m", "s", "y" ],
-        "storageAccountNameSuffix": "[toLower(replace(parameters('tenantName'),'-',''))]",
-        "addressrange": {
-            "global": "10.0.0.0/16",
-            "regserver": "10.0.0.0/24",
-            "regserverdatabase": "10.0.0.1/24",
-            "hostserver": "10.0.0.2/24",
-            "webportal": "10.0.0.3/24"
-        },
-        "vnet": {
-            "name": "[concat(parameters('tenantName'),'-vnet')]",
-            "address": "[variables('addressrange').global]",
-            "subnet": {
-                "regserver": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'regserver')]",
-                    "address": "[variables('addressrange').regserver]"
-                },
-                "regserverdatabase": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'regserverdatabase')]",
-                    "address": "[variables('addressrange').regserverdatabase]"
-                },
-                "hostserver": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'hostserver')]",
-                    "address": "[variables('addressrange').hostserver]"
-                },
-                "webportal": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'webportal')]",
-                    "address": "[variables('addressrange').webportal]"
-                }
-            }
-        },
-        "vm": {
-            "vmStorageAccountContainerName": "vhds",
-            "images": {
-                "standard": {
-                    "publisher": "OpenLogic",
-                    "offer": "CentOS",
-                    "sku": "7.2",
-                    "version": "latest"
-                }
-            },
-            "size": {
-                "regserver": "Standard_A1",
-                "regserverdatabase": "Standard_A1",
-                "hostserver": "Standard_A1",
-                "webportal": "Standard_A1"
-            }
+        "commonSettings": {
+            "tenantName": "[parameters('tenantName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminSecureShellKey": "[parameters('adminSecureShellKey')]",
+            "longtermResourceGroupName": "[parameters('longtermResourceGroupName')]",
+            "deployRegServer": "[parameters('deployRegServer')]",
+            "regServerInstanceCount": "[parameters('regServerInstanceCount')]",
+            "deployPortalServer": "[parameters('deployPortalServer')]",
+            "repositoryUrl": "[parameters('repositoryUrl')]"
         }
     },
     "resources": [
         {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('apiVersions').networkSecurityGroups]",
-            "location": "[resourceGroup().location]",
-            "name": "networkSecurityGroup",
-            "tags": { "displayName": "NetworkSecurityGroup" },
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "regserver-http-in",
-                        "properties": {
-                            "priority": 100,
-                            "description": "Allow TCP/80 Inbound",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "Internet",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
-                            "destinationPortRange": "80"
-                        }
-                    },
-                    {
-                        "name": "regserver-https-in",
-                        "properties": {
-                            "priority": 101,
-                            "description": "Allow TCP/443 Inbound",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "Internet",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
-                            "destinationPortRange": "443"
-                        }
-                    },
-                    {
-                        "name": "regserver-to-regserverdatabase",
-                        "properties": {
-                            "priority": 102,
-                            "description": "Allow TCP/3306 MySQL to Database",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "[variables('addressrange').regserver]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserverdatabase]",
-                            "destinationPortRange": "3306"
-                        }
-                    },
-                    {
-                        "name": "hostserver-http-in",
-                        "properties": {
-                            "priority": 103,
-                            "description": "Allow TCP/80 Inbound",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "Internet",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').hostserver]",
-                            "destinationPortRange": "80"
-                        }
-                    },
-                    {
-                        "name": "hostserver-https-in",
-                        "properties": {
-                            "priority": 104,
-                            "description": "Allow TCP/443 Inbound",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "protocol": "Tcp",
-                            "sourceAddressPrefix": "Internet",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').hostserver]",
-                            "destinationPortRange": "443"
-                        }
-                    },
-                    {
-                        "name": "block-everything",
-                        "properties": {
-                            "priority": 4096,
-                            "description": "Block all inbound traffic",
-                            "access": "Deny",
-                            "direction": "Inbound",
-                            "protocol": "*",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserver]",
-                            "destinationPortRange": "*"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "[variables('apiVersions').virtualNetworks]",
-            "location": "[resourceGroup().location]",
-            "name": "[variables('vnet').name]",
-            "tags": { "displayName": "Virtual Network" },
+            "name": "shared-resources",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', 'networkSecurityGroup')]"
+                "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
             ],
             "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[variables('addressrange').global]"
-                    ]
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('commonSettings').repositoryUrl, 'ARM/shared-resources.json')]",
+                    "contentVersion": "1.0.0.0"
                 },
-                "subnets": [
-                    {
-                        "name": "[variables('vnet').subnet.web.name]",
-                        "properties": {
-                            "addressPrefix": "[variables('vnet').subnet.web.address]",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'networkSecurityGroupwebs')]"
-                            }
-                        }
+                "parameters": {
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
                     }
-                ]
+                }
             }
         }
     ]
