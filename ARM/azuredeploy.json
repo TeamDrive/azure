@@ -96,6 +96,23 @@
                         "address": "10.0.4.0/24"
                     }
                 }
+            },
+            "vm": {
+                "vmStorageAccountContainerName": "vhds",
+                "images": {
+                    "standard": {
+                        "publisher": "OpenLogic",
+                        "offer": "CentOS",
+                        "sku": "7.2",
+                        "version": "latest"
+                    }
+                },
+                "size": {
+                    "regserver": "Standard_A1",
+                    "regserverdatabase": "Standard_A1",
+                    "hostserver": "Standard_A1",
+                    "webportal": "Standard_A1"
+                }
             }
         },
         "tierName": {

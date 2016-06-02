@@ -1,28 +1,7 @@
 ﻿{
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {
-        "tenantName": {
-            "type": "string",
-            "defaultValue": "nrw"
-        },
-        "adminUsername": {
-            "type": "string",
-            "defaultValue": "chgeuer"
-        },
-        "adminSecureShellKey": {
-            "type": "string",
-            "defaultValue": "ssh-rsa AAAAB3Ndeadbeef==",
-            "metadata": { "description": "Admin SSH key for the Virtual Machines." }
-        },
-        "regServerInstanceCount": {
-            "type": "int",
-            "defaultValue": 2
-        },
-        "longtermResourceGroupName": {
-            "type": "string"
-        }
-    },
+    "parameters": { "commonSettings": { "type": "object" } },
     "variables": { },
     "resources": [ ]
 }
