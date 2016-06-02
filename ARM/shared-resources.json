@@ -2,73 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "commonSettings": {
-            "type": "object",
-            "metadata": {
-                "Description": "Common settings object"
-            }
-        }
-    },
-    "variables": {
-        "constants": {
-            "apiVersions": {
-                "storageAccounts": "2015-06-15",
-                "networkSecurityGroups": "2015-06-15",
-                "loadBalancers": "2016-03-30",
-                "virtualNetworks": "2015-06-15",
-                "publicIPAddresses": "2015-06-15",
-                "networkInterfaces": "2015-06-15",
-                "virtualMachines": "2015-06-15",
-                "virtualMachineScaleSets": "2015-06-15"
-            },
-            "tierName": {
-                "regserver": "regserver",
-                "regserverdatabase": "regserverdatabase",
-                "hostserver": "hostserver",
-                "webportal": "webportal"
-            },
-            "publicIPs": {
-                "regserver": "regserver",
-                "hostserver": "hostserver",
-                "webportal": "webportal"
-            }
-        },
-        "tenantName": "[parameters('commonSettings').tenantName]",
-        "longtermResourceGroupName": "[parameters('commonSettings').longtermResourceGroupName]",
-        "repositoryUrl": "[parameters('commonSettings').repositoryUrl]",
-        "vnet": {
-            "name": "[concat(variables('tenantName'),'-vnet')]",
-            "address": "10.0.0.0/16",
-            "subnet": {
-                "regserver": {
-                    "name": "[concat('subnet-', variables('constants').tierName.regserver)]",
-                    "nsgName": "[concat('nsg-', variables('constants').tierName.regserver)]",
-                    "address": "10.0.1.0/24"
-                },
-                "regserverdatabase": {
-                    "name": "[concat('subnet-', variables('constants').tierName.regserverdatabase)]",
-                    "nsgName": "[concat('nsg-', variables('constants').tierName.regserverdatabase)]",
-                    "address": "10.0.2.0/24"
-                },
-                "hostserver": {
-                    "name": "[concat('subnet-', variables('constants').tierName.hostserver)]",
-                    "nsgName": "[concat('nsg-', variables('constants').tierName.hostserver)]",
-                    "address": "10.0.3.0/24"
-                },
-                "webportal": {
-                    "name": "[concat('subnet-', variables('constants').tierName.webportal)]",
-                    "nsgName": "[concat('nsg-', variables('constants').tierName.webportal)]",
-                    "address": "10.0.4.0/24"
-                }
-            }
-        }
+        "commonSettings": { "type": "object" }
     },
     "resources": [
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
-            "name": "[variables('vnet').subnet.regserver.nsgName]",
+            "name": "[parameters('commonSettings').vnet.subnet.regserver.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup RegServer" },
             "properties": {
                 "securityRules": [
@@ -82,7 +23,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "Internet",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.regserver.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
                             "destinationPortRange": "80"
                         }
                     },
@@ -96,7 +37,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "Internet",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.regserver.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
                             "destinationPortRange": "443"
                         }
                     },
@@ -108,9 +49,9 @@
                             "access": "Allow",
                             "direction": "Outbound",
                             "protocol": "Tcp",
-                            "sourceAddressPrefix": "[variables('vnet').subnet.regserver.address]",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
                             "destinationPortRange": "3306"
                         }
                     },
@@ -124,7 +65,7 @@
                             "protocol": "*",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.regserver.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
                             "destinationPortRange": "*"
                         }
                     }
@@ -133,9 +74,9 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
-            "name": "[variables('vnet').subnet.regserverdatabase.nsgName]",
+            "name": "[parameters('commonSettings').vnet.subnet.regserverdatabase.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup RegServer Database" },
             "properties": {
                 "securityRules": [
@@ -147,9 +88,9 @@
                             "access": "Allow",
                             "direction": "Inbound",
                             "protocol": "Tcp",
-                            "sourceAddressPrefix": "[variables('vnet').subnet.regserver.address]",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
                             "destinationPortRange": "3306"
                         }
                     },
@@ -163,7 +104,7 @@
                             "protocol": "*",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
                             "destinationPortRange": "*"
                         }
                     }
@@ -172,9 +113,9 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
-            "name": "[variables('vnet').subnet.hostserver.nsgName]",
+            "name": "[parameters('commonSettings').vnet.subnet.hostserver.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup HostServer" },
             "properties": {
                 "securityRules": [
@@ -188,7 +129,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "Internet",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.hostserver.address]",
                             "destinationPortRange": "80"
                         }
                     },
@@ -202,7 +143,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "Internet",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.hostserver.address]",
                             "destinationPortRange": "443"
                         }
                     },
@@ -216,7 +157,7 @@
                             "protocol": "*",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.hostserver.address]",
                             "destinationPortRange": "*"
                         }
                     }
@@ -225,9 +166,9 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "[variables('constants').apiVersions.networkSecurityGroups]",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
-            "name": "[variables('vnet').subnet.webportal.nsgName]",
+            "name": "[parameters('commonSettings').vnet.subnet.webportal.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup PortalServer" },
             "properties": {
                 "securityRules": [
@@ -241,7 +182,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "Internet",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.webportal.address]",
                             "destinationPortRange": "80"
                         }
                     },
@@ -255,7 +196,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "Internet",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.webportal.address]",
                             "destinationPortRange": "443"
                         }
                     },
@@ -269,7 +210,7 @@
                             "protocol": "*",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.webportal.address]",
                             "destinationPortRange": "*"
                         }
                     }
@@ -278,66 +219,60 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "[variables('constants').apiVersions.virtualNetworks]",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualNetworks]",
             "location": "[resourceGroup().location]",
-            "name": "[variables('vnet').name]",
+            "name": "[parameters('commonSettings').vnet.name]",
             "tags": { "displayName": "Virtual Network" },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.regserver.nsgName)]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.hostserver.nsgName)]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('vnet').subnet.webportal.nsgName)]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.regserver.nsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.hostserver.nsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.webportal.nsgName)]"
             ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('vnet').address]"
+                        "[parameters('commonSettings').vnet.address]"
                     ]
                 },
                 "subnets": [
                     {
-                        "name": "[variables('vnet').subnet.regserver.name]",
+                        "name": "[parameters('commonSettings').vnet.subnet.regserver.name]",
                         "properties": {
-                            "addressPrefix": "[variables('vnet').subnet.regserver.address]",
+                            "addressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserver.nsgName)]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('commonSettings').vnet.subnet.regserver.nsgName)]"
                             }
                         }
                     },
                     {
-                        "name": "[variables('vnet').subnet.regserverdatabase.name]",
+                        "name": "[parameters('commonSettings').vnet.subnet.regserverdatabase.name]",
                         "properties": {
-                            "addressPrefix": "[variables('vnet').subnet.regserverdatabase.address]",
+                            "addressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.regserverdatabase.nsgName)]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('commonSettings').vnet.subnet.regserverdatabase.nsgName)]"
                             }
                         }
                     },
                     {
-                        "name": "[variables('vnet').subnet.hostserver.name]",
+                        "name": "[parameters('commonSettings').vnet.subnet.hostserver.name]",
                         "properties": {
-                            "addressPrefix": "[variables('vnet').subnet.hostserver.address]",
+                            "addressPrefix": "[parameters('commonSettings').vnet.subnet.hostserver.address]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.hostserver.nsgName)]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('commonSettings').vnet.subnet.hostserver.nsgName)]"
                             }
                         }
                     },
                     {
-                        "name": "[variables('vnet').subnet.webportal.name]",
+                        "name": "[parameters('commonSettings').vnet.subnet.webportal.name]",
                         "properties": {
-                            "addressPrefix": "[variables('vnet').subnet.webportal.address]",
+                            "addressPrefix": "[parameters('commonSettings').vnet.subnet.webportal.address]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vnet').subnet.webportal.nsgName)]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('commonSettings').vnet.subnet.webportal.nsgName)]"
                             }
                         }
                     }
                 ]
             }
         }
-    ],
-    "outputs": {
-        "vnet": {
-            "value": "[variables('vnet')]",
-            "type": "object"
-        }
-    }
+    ]
 }

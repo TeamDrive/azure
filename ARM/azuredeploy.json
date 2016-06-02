@@ -81,6 +81,32 @@
                 "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('constants').publicIPs.regserver))]",
                 "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('constants').publicIPs.hostserver))]",
                 "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-', variables('constants').publicIPs.webportal))]"
+            },
+            "vnet": {
+                "name": "[concat(parameters('tenantName'),'-vnet')]",
+                "address": "10.0.0.0/16",
+                "subnet": {
+                    "regserver": {
+                        "name": "[concat('subnet-', variables('commonSettings').constants.tierName.regserver)]",
+                        "nsgName": "[concat('nsg-', variables('commonSettings').constants.tierName.regserver)]",
+                        "address": "10.0.1.0/24"
+                    },
+                    "regserverdatabase": {
+                        "name": "[concat('subnet-', variables('commonSettings').constants.tierName.regserverdatabase)]",
+                        "nsgName": "[concat('nsg-', variables('commonSettings').constants.tierName.regserverdatabase)]",
+                        "address": "10.0.2.0/24"
+                    },
+                    "hostserver": {
+                        "name": "[concat('subnet-', variables('commonSettings').constants.tierName.hostserver)]",
+                        "nsgName": "[concat('nsg-', variables('commonSettings').constants.tierName.hostserver)]",
+                        "address": "10.0.3.0/24"
+                    },
+                    "webportal": {
+                        "name": "[concat('subnet-', variables('commonSettings').constants.tierName.webportal)]",
+                        "nsgName": "[concat('nsg-', variables('commonSettings').constants.tierName.webportal)]",
+                        "address": "10.0.4.0/24"
+                    }
+                }
             }
         }
     },
