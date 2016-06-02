@@ -44,30 +44,31 @@
         }
     },
     "variables": {
-        "constants": {
-            "apiVersions": {
-                "storageAccounts": "2015-06-15",
-                "networkSecurityGroups": "2015-06-15",
-                "loadBalancers": "2016-03-30",
-                "virtualNetworks": "2015-06-15",
-                "publicIPAddresses": "2015-06-15",
-                "networkInterfaces": "2015-06-15",
-                "virtualMachines": "2015-06-15",
-                "virtualMachineScaleSets": "2015-06-15"
-            },
-            "tierName": {
-                "regserver": "regserver",
-                "regserverdatabase": "regserverdatabase",
-                "hostserver": "hostserver",
-                "webportal": "webportal"
-            },
-            "publicIPs": {
-                "regserver": "regserver",
-                "hostserver": "hostserver",
-                "webportal": "webportal"
-            }
-        },
         "commonSettings": {
+            "constants": {
+                "apiVersions": {
+                    "storageAccounts": "2015-06-15",
+                    "networkSecurityGroups": "2015-06-15",
+                    "loadBalancers": "2016-03-30",
+                    "virtualNetworks": "2015-06-15",
+                    "publicIPAddresses": "2015-06-15",
+                    "networkInterfaces": "2015-06-15",
+                    "virtualMachines": "2015-06-15",
+                    "virtualMachineScaleSets": "2015-06-15",
+                    "deployments": "2015-01-01"
+                },
+                "tierName": {
+                    "regserver": "regserver",
+                    "regserverdatabase": "regserverdatabase",
+                    "hostserver": "hostserver",
+                    "webportal": "webportal"
+                },
+                "publicIPs": {
+                    "regserver": "regserver",
+                    "hostserver": "hostserver",
+                    "webportal": "webportal"
+                }
+            },
             "tenantName": "[parameters('tenantName')]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminSecureShellKey": "[parameters('adminSecureShellKey')]",
@@ -87,11 +88,31 @@
         {
             "name": "shared-resources",
             "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2015-01-01",
+            "apiVersion": "[variables('commonSettings').constants.apiVersions.deployments]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[concat(variables('commonSettings').repositoryUrl, 'ARM/shared-resources.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "regserver-resources",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('commonSettings').constants.apiVersions.deployments]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('commonSettings').repositoryUrl, 'ARM/regserver-', parameters('deployRegServer'), '.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {

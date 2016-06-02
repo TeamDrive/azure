@@ -333,5 +333,11 @@
                 ]
             }
         }
-    ]
+    ],
+    "outputs": {
+        "vnet": {
+            "value": "[variables('vnet')]",
+            "type": "object"
+        }
+    }
 }
