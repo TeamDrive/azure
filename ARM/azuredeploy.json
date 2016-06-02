@@ -20,10 +20,10 @@
         },
         "deployRegServer": {
             "type": "string",
-            "defaultValue": "Enabled",
+            "defaultValue": "enabled",
             "allowedValues": [
-                "Enabled",
-                "Disabled"
+                "enabled",
+                "disabled"
             ]
         },
         "regServerInstanceCount": {
@@ -32,10 +32,10 @@
         },
         "deployPortalServer": {
             "type": "string",
-            "defaultValue": "Enabled",
+            "defaultValue": "enabled",
             "allowedValues": [
-                "Enabled",
-                "Disabled"
+                "enabled",
+                "disabled"
             ]
         },
         "repositoryUrl": {
