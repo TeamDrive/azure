@@ -19,18 +19,16 @@ $parameters=@{
 
 New-AzureRmResourceGroup `
 	-Name $longtermResourceGroupName `
-	-Location $location
+	-Location $location `
+	-Force
 
 New-AzureRmResourceGroupDeployment `
 	-ResourceGroupName $longtermResourceGroupName `
 	-TemplateUri "$($repositoryUrl)/ARM/longterm.json" `
 	-TemplateParameterObject $parameters `
 	-Mode Complete  `
-	-Verbose
-
-
-
+	-Verbose`
+	-Force
 
 
 # https://nocentdocent.wordpress.com/2015/09/24/deploying-azure-arm-templates-with-powershell/
-
