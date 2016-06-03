@@ -30,6 +30,7 @@ $commonSettings = @{
 	databaseNodeInstanceCount=$databaseNodeInstanceCount
 	adminUsername=$env:USERNAME.ToLower()
 	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
+	juliasPasswort="ziuziui"
 }
 
 New-AzureRmResourceGroup `
