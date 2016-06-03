@@ -26,7 +26,6 @@ $commonSettings = @{
 	regServerInstanceCount=$regServerInstanceCount
 	deployPortalServer=$(if($portalServerInstanceCount -gt 0) { "enabled" } else { "disabled" })
 	repositoryUrl=$repositoryUrl
-	danielsSpezialWert=4
 }
 
 New-AzureRmResourceGroup `

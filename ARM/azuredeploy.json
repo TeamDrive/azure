@@ -178,7 +178,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('commonSettings').repositoryUrl, 'ARM/regserver-', parameters('deployRegServer'), '.json')]",
+                    "uri": "[concat(variables('commonSettings').repositoryUrl, 'ARM/', concat('regserver-', parameters('deployRegServer'), '.json'))]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {

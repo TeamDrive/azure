@@ -321,6 +321,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.jumphost.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.regserver.nsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.regserverdatabase.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.hostserver.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.webportal.nsgName)]"
             ],

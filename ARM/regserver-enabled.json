@@ -7,8 +7,8 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkInterfaces]",
             "location": "[resourceGroup().location]",
-            "name": "testnic",
-            "tags": { "displayName": "Jump Host - Network Interface Card" },
+            "name": "nic-regserver",
+            "tags": { "displayName": "RegServer - Network Interface Card" },
             "properties": {
                 "ipConfigurations": [
                     {
@@ -20,7 +20,7 @@
                                 "id": "[parameters('commonSettings').ipAddressId.regserver]"
                             },
                             "subnet": {
-                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.regserver.name)]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.regserver.name)]"
                             }
                         }
                     }
