@@ -148,7 +148,7 @@
                         }
                     },
                     {
-                        "name": "webportal-to-database",
+                        "name": "hostserver-to-database",
                         "properties": {
                             "priority": 103,
                             "description": "Allow TCP/3306 MySQL to Database",
