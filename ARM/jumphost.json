@@ -16,7 +16,8 @@
                 "dnsSettings": {
                     "domainNameLabel": "[concat(parameters('commonSettings').tenantName, '-', 'jumphost')]"
                 },
-                "publicIPAllocationMethod": "Dynamic"
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 30
             }
         },
         {

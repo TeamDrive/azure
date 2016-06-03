@@ -1,4 +1,4 @@
-$tenantName = "saxony11"
+$tenantName = "saxony12"
 $location = "West Europe"
 
 $githubUser = "chgeuer"
@@ -8,7 +8,7 @@ $_ignore = & git commit -am "." -q
 $branch =  & git rev-parse HEAD
 $repositoryUrl = "https://raw.githubusercontent.com/$($githubUser)/$($githubProject)/$($branch)/"
 
-Write-Host "Pusing to '$($repositoryUrl)'"
+Write-Host "Pushing to '$($repositoryUrl)'"
 $_ignore = & git push origin master -q
 
 $longtermResourceGroupName = "longterm-$($tenantName)"

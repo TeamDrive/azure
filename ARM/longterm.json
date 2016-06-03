@@ -8,7 +8,6 @@
         }
     },
     "variables": {
-        "repositoryUrl": "https://raw.githubusercontent.com/chgeuer/td/master/",
         "constants": {
             "apiVersions": {
                 "storageAccounts": "2015-06-15",
