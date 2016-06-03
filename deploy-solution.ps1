@@ -1,4 +1,4 @@
-$tenantName = "saxony13"
+$tenantName = "saxony14"
 $location="West Europe"
 
 $authorizedKeyFilename = "C:\Users\chgeuer\puttykeys\authorizedkeys.txt"
@@ -30,7 +30,6 @@ $commonSettings = @{
 	databaseNodeInstanceCount=$databaseNodeInstanceCount
 	adminUsername=$env:USERNAME.ToLower()
 	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
-	juliasPasswort="ziuziui"
 }
 
 New-AzureRmResourceGroup `

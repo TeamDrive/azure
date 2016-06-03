@@ -14,24 +14,22 @@
             }
         },
         {
+            "copy": {
+                "name": "databaseNicCopy",
+                "count": "[parameters('commonSettings').databaseNodeInstanceCount]"
+            },
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkInterfaces]",
             "location": "[resourceGroup().location]",
-            "name": "nic-database",
+            "name": "[concat('nic-database-', copyIndex())]",
             "tags": { "displayName": "Database - Network Interface Card" },
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', concat(parameters('commonSettings').tenantName, '-', 'database'))]"
-            ],
             "properties": {
                 "ipConfigurations": [
                     {
                         "name": "ipconfig-database",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.database.addressRangePrefix, '10')]",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('commonSettings').tenantName, '-', 'database'))]"
-                            },
+                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.database.addressRangePrefix, copyIndex(10))]",
                             "subnet": {
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.database.name)]"
                             }
@@ -41,14 +39,18 @@
             }
         },
         {
+            "copy": {
+                "name": "databaseVmCopy",
+                "count": "[parameters('commonSettings').databaseNodeInstanceCount]"
+            },
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
             "location": "[resourceGroup().location]",
-            "name": "[concat(parameters('commonSettings').tenantName, '-vm-database')]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-vm-database-', copyIndex())]",
             "tags": { "displayName": "Jump Host - Virtual Machine" },
             "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'database'))]",
-                "[concat('Microsoft.Network/networkInterfaces/', 'nic-database')]"
+                "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'databaseos'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', concat('nic-database-', copyIndex()))]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -77,9 +79,9 @@
                         "version": "[parameters('commonSettings').vm.images.standard.version]"
                     },
                     "osDisk": {
-                        "name": "[concat(parameters('commonSettings').tenantName, '-database-osdisk')]",
+                        "name": "[concat(parameters('commonSettings').tenantName, '-database-osdisk-', copyIndex())]",
                         "vhd": {
-                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'database'), '.blob.core.windows.net/vhds/database-osdisk.vhd') ]"
+                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'databaseos'), '.blob.core.windows.net/vhds/database-osdisk-', copyIndex(), '.vhd') ]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -88,7 +90,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'nic-database')]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-database-', copyIndex()))]"
                         }
                     ]
                 }
