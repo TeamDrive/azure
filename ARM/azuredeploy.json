@@ -70,6 +70,7 @@
             "adminSecureShellKey": "[parameters('adminSecureShellKey')]",
             "longtermResourceGroupName": "[parameters('longtermResourceGroupName')]",
             "deployRegServer": "[parameters('deployRegServer')]",
+            "danielsSpezialwert": 2,
             "regServerInstanceCount": "[parameters('regServerInstanceCount')]",
             "deployPortalServer": "[parameters('deployPortalServer')]",
             "repositoryUrl": "[parameters('repositoryUrl')]",
@@ -123,7 +124,8 @@
                     "regserver": "Standard_A1",
                     "regserverdatabase": "Standard_A1",
                     "hostserver": "Standard_A1",
-                    "webportal": "Standard_A1"
+                    "webportal": "Standard_A1",
+                    "jumphost": "Standard_A0"
                 }
             }
         }

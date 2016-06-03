@@ -1,4 +1,4 @@
-$tenantName = "saxony11"
+$tenantName = "saxony12"
 $location="West Europe"
 
 $authorizedKeyFilename = "C:\Users\chgeuer\puttykeys\authorizedkeys.txt"
@@ -23,9 +23,10 @@ $commonSettings = @{
 	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
 	longtermResourceGroupName="longterm-$($tenantName)"
 	deployRegServer=$(if($regServerInstanceCount -gt 0) { "enabled" } else { "disabled" })
-	regServerInstanceCount=2
+	regServerInstanceCount=$regServerInstanceCount
 	deployPortalServer=$(if($portalServerInstanceCount -gt 0) { "enabled" } else { "disabled" })
 	repositoryUrl=$repositoryUrl
+	danielsSpezialWert=4
 }
 
 New-AzureRmResourceGroup `
