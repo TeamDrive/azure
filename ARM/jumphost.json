@@ -46,6 +46,70 @@
                     }
                 ]
             }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.storageAccounts]",
+            "location": "[resourceGroup().location]",
+            "properties": { "accountType": "Standard_LRS" },
+            "name": "[concat(parameters('commonSettings').tenantName, 'jumphost')]",
+            "tags": {
+                "displayName": "StorageAccount Jumphost"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-vm-jumphost')]",
+            "tags": { "displayName": "Jump Host - Virtual Machine" },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'jumphost'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic-jumphost')]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('commonSettings').vm.size.jumphost]"
+                },
+                "osProfile": {
+                    "computerName": "jumphost",
+                    "adminUsername": "[parameters('commonSettings').adminUsername]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": "true",
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('commonSettings').adminUsername, '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('commonSettings').adminSecureShellKey]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('commonSettings').vm.images.standard.publisher]",
+                        "offer": "[parameters('commonSettings').vm.images.standard.offer]",
+                        "sku": "[parameters('commonSettings').vm.images.standard.sku]",
+                        "version": "[parameters('commonSettings').vm.images.standard.version]"
+                    },
+                    "osDisk": {
+                        "name": "[concat(parameters('commonSettings').tenantName, '-jumphost-osdisk')]",
+                        "vhd": {
+                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'jumphost'), '.blob.core.windows.net/vhds/jumphost-osdisk.vhd') ]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'nic-jumphost')]"
+                        }
+                    ]
+                }
+            }
         }
     ]
 }
