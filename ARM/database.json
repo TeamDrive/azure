@@ -4,43 +4,36 @@
     "parameters": { "commonSettings": { "type": "object" } },
     "resources": [
         {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "[parameters('commonSettings').constants.apiVersions.publicIPAddresses]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.storageAccounts]",
             "location": "[resourceGroup().location]",
-            "name": "[concat(parameters('commonSettings').tenantName, '-', 'jumphost')]",
+            "properties": { "accountType": "Standard_LRS" },
+            "name": "[concat(parameters('commonSettings').tenantName, 'databaseos')]",
             "tags": {
-                "displayName": "Public IP Jumphost",
-                "tenantName": "[parameters('commonSettings').tenantName]"
-            },
-            "properties": {
-                "dnsSettings": {
-                    "domainNameLabel": "[concat(parameters('commonSettings').tenantName, '-', 'jumphost')]"
-                },
-                "publicIPAllocationMethod": "Dynamic",
-                "idleTimeoutInMinutes": 30
+                "displayName": "StorageAccount database"
             }
         },
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkInterfaces]",
             "location": "[resourceGroup().location]",
-            "name": "nic-jumphost",
-            "tags": { "displayName": "Jump Host - Network Interface Card" },
+            "name": "nic-database",
+            "tags": { "displayName": "Database - Network Interface Card" },
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', concat(parameters('commonSettings').tenantName, '-', 'jumphost'))]"
+                "[concat('Microsoft.Network/publicIPAddresses/', concat(parameters('commonSettings').tenantName, '-', 'database'))]"
             ],
             "properties": {
                 "ipConfigurations": [
                     {
-                        "name": "ipconfig-jumphost",
+                        "name": "ipconfig-database",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.jumphost.addressRangePrefix, '10')]",
+                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.database.addressRangePrefix, '10')]",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('commonSettings').tenantName, '-', 'jumphost'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('commonSettings').tenantName, '-', 'database'))]"
                             },
                             "subnet": {
-                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.jumphost.name)]"
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.database.name)]"
                             }
                         }
                     }
@@ -48,31 +41,21 @@
             }
         },
         {
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "[parameters('commonSettings').constants.apiVersions.storageAccounts]",
-            "location": "[resourceGroup().location]",
-            "properties": { "accountType": "Standard_LRS" },
-            "name": "[concat(parameters('commonSettings').tenantName, 'jumphost')]",
-            "tags": {
-                "displayName": "StorageAccount Jumphost"
-            }
-        },
-        {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
             "location": "[resourceGroup().location]",
-            "name": "[concat(parameters('commonSettings').tenantName, '-vm-jumphost')]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-vm-database')]",
             "tags": { "displayName": "Jump Host - Virtual Machine" },
             "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'jumphost'))]",
-                "[concat('Microsoft.Network/networkInterfaces/', 'nic-jumphost')]"
+                "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'database'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic-database')]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('commonSettings').vm.size.jumphost]"
+                    "vmSize": "[parameters('commonSettings').vm.size.database]"
                 },
                 "osProfile": {
-                    "computerName": "jumphost",
+                    "computerName": "database",
                     "adminUsername": "[parameters('commonSettings').adminUsername]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": "true",
@@ -94,9 +77,9 @@
                         "version": "[parameters('commonSettings').vm.images.standard.version]"
                     },
                     "osDisk": {
-                        "name": "[concat(parameters('commonSettings').tenantName, '-jumphost-osdisk')]",
+                        "name": "[concat(parameters('commonSettings').tenantName, '-database-osdisk')]",
                         "vhd": {
-                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'jumphost'), '.blob.core.windows.net/vhds/jumphost-osdisk.vhd') ]"
+                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'database'), '.blob.core.windows.net/vhds/database-osdisk.vhd') ]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -105,7 +88,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'nic-jumphost')]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'nic-database')]"
                         }
                     ]
                 }

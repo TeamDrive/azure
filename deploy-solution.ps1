@@ -5,7 +5,6 @@ $authorizedKeyFilename = "C:\Users\chgeuer\puttykeys\authorizedkeys.txt"
 $githubUser = "chgeuer"
 $githubProject = "td"
 
-
 $_ignore = & git commit -am "." -q
 $branch =  & git rev-parse HEAD
 $repositoryUrl = "https://raw.githubusercontent.com/$($githubUser)/$($githubProject)/$($branch)/"
@@ -17,6 +16,7 @@ $resourceGroupName="rg-$($tenantName)"
 $hostServerInstanceCount = 1
 $regServerInstanceCount = 2
 $portalServerInstanceCount = 0
+$databaseNodeInstanceCount = 1
 
 $commonSettings = @{
 	tenantName=$tenantName
@@ -27,6 +27,7 @@ $commonSettings = @{
 	regServerInstanceCount=$regServerInstanceCount
 	deployPortalServer=$(if($portalServerInstanceCount -gt 0) { "enabled" } else { "disabled" })
 	portalServerInstanceCount=$portalServerInstanceCount
+	databaseNodeInstanceCount=$databaseNodeInstanceCount
 	adminUsername=$env:USERNAME.ToLower()
 	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
 }

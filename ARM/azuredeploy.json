@@ -41,6 +41,10 @@
             "type": "int",
             "defaultValue": 1
         },
+        "databaseNodeInstanceCount": {
+            "type": "int",
+            "defaultValue": 1
+        },
         "adminUsername": {
             "type": "string",
             "defaultValue": "chgeuer"
@@ -81,6 +85,7 @@
             "regServerInstanceCount": "[parameters('regServerInstanceCount')]",
             "deployPortalServer": "[parameters('deployPortalServer')]",
             "portalServerInstanceCount": "[parameters('portalServerInstanceCount')]",
+            "databaseNodeInstanceCount": "[parameters('databaseNodeInstanceCount')]",
             "adminUsername": "[parameters('adminUsername')]",
             "adminSecureShellKey": "[parameters('adminSecureShellKey')]",
             "ipAddressId": {
@@ -95,26 +100,31 @@
                     "jumphost": {
                         "name": "[concat('subnet-', variables('tierName').jumphost)]",
                         "nsgName": "[concat('nsg-', variables('tierName').jumphost)]",
+                        "addressRangePrefix": "10.0.0",
                         "address": "10.0.0.0/24"
                     },
                     "regserver": {
                         "name": "[concat('subnet-', variables('tierName').regserver)]",
                         "nsgName": "[concat('nsg-', variables('tierName').regserver)]",
+                        "addressRangePrefix": "10.0.1",
                         "address": "10.0.1.0/24"
-                    },
-                    "database": {
-                        "name": "[concat('subnet-', variables('tierName').database)]",
-                        "nsgName": "[concat('nsg-', variables('tierName').database)]",
-                        "address": "10.0.2.0/24"
                     },
                     "hostserver": {
                         "name": "[concat('subnet-', variables('tierName').hostserver)]",
                         "nsgName": "[concat('nsg-', variables('tierName').hostserver)]",
-                        "address": "10.0.3.0/24"
+                        "addressRangePrefix": "10.0.2",
+                        "address": "10.0.2.0/24"
                     },
                     "webportal": {
                         "name": "[concat('subnet-', variables('tierName').webportal)]",
                         "nsgName": "[concat('nsg-', variables('tierName').webportal)]",
+                        "addressRangePrefix": "10.0.3",
+                        "address": "10.0.3.0/24"
+                    },
+                    "database": {
+                        "name": "[concat('subnet-', variables('tierName').database)]",
+                        "nsgName": "[concat('nsg-', variables('tierName').database)]",
+                        "addressRangePrefix": "10.0.4",
                         "address": "10.0.4.0/24"
                     }
                 }
