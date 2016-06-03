@@ -29,7 +29,7 @@
                         "name": "ipconfig-database",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.database.addressRangePrefix, copyIndex(10))]",
+                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.database.addressRangePrefix, '.', copyIndex(10))]",
                             "subnet": {
                                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.database.name)]"
                             }
