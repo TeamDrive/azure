@@ -1,4 +1,4 @@
-$tenantName = "saxony14"
+$tenantName = (Get-Content -Path "tenantName.txt").Trim()
 $location = "West Europe"
 
 $githubUser = "chgeuer"
