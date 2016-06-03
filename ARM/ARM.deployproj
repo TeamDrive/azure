@@ -32,6 +32,7 @@
     <Content Include="portalserver-disabled.json" />
     <Content Include="portalserver-enabled.json" />
     <Content Include="regserver-disabled.json" />
+    <Content Include="jumphost.json" />
     <Content Include="shared-resources.json" />
     <Content Include="regserver-enabled.json" />
     <Content Include="azuredeploy.json" />

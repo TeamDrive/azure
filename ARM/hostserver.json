@@ -51,7 +51,7 @@
         "addressrange": {
             "global": "10.0.0.0/16",
             "regserver": "10.0.0.0/24",
-            "regserverdatabase": "10.0.0.1/24",
+            "database": "10.0.0.1/24",
             "hostserver": "10.0.0.2/24",
             "webportal": "10.0.0.3/24"
         },
@@ -63,9 +63,9 @@
                     "name": "[concat(parameters('tenantName'), '-subnet-', 'regserver')]",
                     "address": "[variables('addressrange').regserver]"
                 },
-                "regserverdatabase": {
-                    "name": "[concat(parameters('tenantName'), '-subnet-', 'regserverdatabase')]",
-                    "address": "[variables('addressrange').regserverdatabase]"
+                "database": {
+                    "name": "[concat(parameters('tenantName'), '-subnet-', 'database')]",
+                    "address": "[variables('addressrange').database]"
                 },
                 "hostserver": {
                     "name": "[concat(parameters('tenantName'), '-subnet-', 'hostserver')]",
@@ -89,7 +89,7 @@
             },
             "size": {
                 "regserver": "Standard_A1",
-                "regserverdatabase": "Standard_A1",
+                "database": "Standard_A1",
                 "hostserver": "Standard_A1",
                 "webportal": "Standard_A1"
             }
@@ -133,7 +133,7 @@
                         }
                     },
                     {
-                        "name": "regserver-to-regserverdatabase",
+                        "name": "regserver-to-database",
                         "properties": {
                             "priority": 102,
                             "description": "Allow TCP/3306 MySQL to Database",
@@ -142,7 +142,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "[variables('addressrange').regserver]",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[variables('addressrange').regserverdatabase]",
+                            "destinationAddressPrefix": "[variables('addressrange').database]",
                             "destinationPortRange": "3306"
                         }
                     },

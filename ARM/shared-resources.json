@@ -81,7 +81,7 @@
                         }
                     },
                     {
-                        "name": "regserver-to-regserverdatabase",
+                        "name": "regserver-to-database",
                         "properties": {
                             "priority": 102,
                             "description": "Allow TCP/3306 MySQL to Database",
@@ -90,7 +90,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
                             "destinationPortRange": "3306"
                         }
                     },
@@ -129,12 +129,12 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkSecurityGroups]",
             "location": "[resourceGroup().location]",
-            "name": "[parameters('commonSettings').vnet.subnet.regserverdatabase.nsgName]",
+            "name": "[parameters('commonSettings').vnet.subnet.database.nsgName]",
             "tags": { "displayName": "NetworkSecurityGroup RegServer Database" },
             "properties": {
                 "securityRules": [
                     {
-                        "name": "regserver-to-regserverdatabase",
+                        "name": "regserver-to-database",
                         "properties": {
                             "priority": 102,
                             "description": "Allow TCP/3306 MySQL to Database",
@@ -143,7 +143,35 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserver.address]",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
+                            "destinationPortRange": "3306"
+                        }
+                    },
+                    {
+                        "name": "webportal-to-database",
+                        "properties": {
+                            "priority": 103,
+                            "description": "Allow TCP/3306 MySQL to Database",
+                            "access": "Allow",
+                            "direction": "Outbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.hostserver.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
+                            "destinationPortRange": "3306"
+                        }
+                    },
+                    {
+                        "name": "webportal-to-database",
+                        "properties": {
+                            "priority": 104,
+                            "description": "Allow TCP/3306 MySQL to Database",
+                            "access": "Allow",
+                            "direction": "Outbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.webportal.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
                             "destinationPortRange": "3306"
                         }
                     },
@@ -157,7 +185,7 @@
                             "protocol": "Tcp",
                             "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.jumphost.address]",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
                             "destinationPortRange": "22"
                         }
                     },
@@ -171,7 +199,7 @@
                             "protocol": "*",
                             "sourceAddressPrefix": "*",
                             "sourcePortRange": "*",
-                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
                             "destinationPortRange": "*"
                         }
                     }
@@ -186,6 +214,20 @@
             "tags": { "displayName": "NetworkSecurityGroup HostServer" },
             "properties": {
                 "securityRules": [
+                    {
+                        "name": "hostserver-to-database",
+                        "properties": {
+                            "priority": 102,
+                            "description": "Allow TCP/3306 MySQL to Database",
+                            "access": "Allow",
+                            "direction": "Outbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.hostserver.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
+                            "destinationPortRange": "3306"
+                        }
+                    },
                     {
                         "name": "hostserver-http-in",
                         "properties": {
@@ -254,6 +296,20 @@
             "properties": {
                 "securityRules": [
                     {
+                        "name": "webportal-to-database",
+                        "properties": {
+                            "priority": 102,
+                            "description": "Allow TCP/3306 MySQL to Database",
+                            "access": "Allow",
+                            "direction": "Outbound",
+                            "protocol": "Tcp",
+                            "sourceAddressPrefix": "[parameters('commonSettings').vnet.subnet.webportal.address]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
+                            "destinationPortRange": "3306"
+                        }
+                    },
+                    {
                         "name": "hostserver-http-in",
                         "properties": {
                             "priority": 103,
@@ -321,7 +377,7 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.jumphost.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.regserver.nsgName)]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.regserverdatabase.nsgName)]",
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.database.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.hostserver.nsgName)]",
                 "[concat('Microsoft.Network/networkSecurityGroups/', parameters('commonSettings').vnet.subnet.webportal.nsgName)]"
             ],
@@ -351,11 +407,11 @@
                         }
                     },
                     {
-                        "name": "[parameters('commonSettings').vnet.subnet.regserverdatabase.name]",
+                        "name": "[parameters('commonSettings').vnet.subnet.database.name]",
                         "properties": {
-                            "addressPrefix": "[parameters('commonSettings').vnet.subnet.regserverdatabase.address]",
+                            "addressPrefix": "[parameters('commonSettings').vnet.subnet.database.address]",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('commonSettings').vnet.subnet.regserverdatabase.nsgName)]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('commonSettings').vnet.subnet.database.nsgName)]"
                             }
                         }
                     },

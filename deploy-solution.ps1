@@ -1,4 +1,4 @@
-$tenantName = "saxony12"
+$tenantName = "saxony13"
 $location="West Europe"
 
 $authorizedKeyFilename = "C:\Users\chgeuer\puttykeys\authorizedkeys.txt"
@@ -14,18 +14,21 @@ Write-Host "Pusing to '$($repositoryUrl)'"
 $_ignore = & git push origin master -q
 
 $resourceGroupName="rg-$($tenantName)"
+$hostServerInstanceCount = 1
 $regServerInstanceCount = 2
 $portalServerInstanceCount = 0
 
 $commonSettings = @{
 	tenantName=$tenantName
-	adminUsername=$env:USERNAME.ToLower()
-	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
+	repositoryUrl=$repositoryUrl
 	longtermResourceGroupName="longterm-$($tenantName)"
+	hostServerInstanceCount=$hostServerInstanceCount
 	deployRegServer=$(if($regServerInstanceCount -gt 0) { "enabled" } else { "disabled" })
 	regServerInstanceCount=$regServerInstanceCount
 	deployPortalServer=$(if($portalServerInstanceCount -gt 0) { "enabled" } else { "disabled" })
-	repositoryUrl=$repositoryUrl
+	portalServerInstanceCount=$portalServerInstanceCount
+	adminUsername=$env:USERNAME.ToLower()
+	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
 }
 
 New-AzureRmResourceGroup `

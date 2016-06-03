@@ -6,17 +6,16 @@
             "type": "string",
             "defaultValue": "nrw"
         },
-        "adminUsername": {
+        "repositoryUrl": {
             "type": "string",
-            "defaultValue": "chgeuer"
-        },
-        "adminSecureShellKey": {
-            "type": "string",
-            "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAklvcJCA1K82mjlxM1ZHP1PF7eqKZ5KcmxLeNSJ7vMLD1/XUMZ667P2Ep7iu/J4Ci4u6V4LyYDodhRRFZaaxMFHTUVTwcApuh0fl4UJY/Evd6R+A66zxG8oSG75KQTiOYsV4cZ1PnMfg1Y014n814VGKd68ZHKc2KQFLGfsBZ7Hqc2NIU1Y0AxNaeHG8i9FlhSSCDuk/Lyh3o+vJl3GKFMezua5+rFG+H8wPSCN9tkrf+zpW1ynyXC+xEn9eenLcryyqa9G2MYR1FgClxLTgZzAHYCnmMgsMxxvMVOlI6nLS3sFh4+14j8wgPbv4TzH3AI7PxcGbOvWGvlTsLRL/nmQ==",
-            "metadata": { "description": "Admin SSH key for the Virtual Machines." }
+            "defaultValue": "https://raw.githubusercontent.com/chgeuer/td/master/"
         },
         "longtermResourceGroupName": {
             "type": "string"
+        },
+        "hostServerInstanceCount": {
+            "type": "int",
+            "defaultValue": 1
         },
         "deployRegServer": {
             "type": "string",
@@ -28,7 +27,7 @@
         },
         "regServerInstanceCount": {
             "type": "int",
-            "defaultValue": 2
+            "defaultValue": 1
         },
         "deployPortalServer": {
             "type": "string",
@@ -38,15 +37,24 @@
                 "disabled"
             ]
         },
-        "repositoryUrl": {
+        "portalServerInstanceCount": {
+            "type": "int",
+            "defaultValue": 1
+        },
+        "adminUsername": {
             "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/chgeuer/td/master/"
+            "defaultValue": "chgeuer"
+        },
+        "adminSecureShellKey": {
+            "type": "string",
+            "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAklvcJCA1K82mjlxM1ZHP1PF7eqKZ5KcmxLeNSJ7vMLD1/XUMZ667P2Ep7iu/J4Ci4u6V4LyYDodhRRFZaaxMFHTUVTwcApuh0fl4UJY/Evd6R+A66zxG8oSG75KQTiOYsV4cZ1PnMfg1Y014n814VGKd68ZHKc2KQFLGfsBZ7Hqc2NIU1Y0AxNaeHG8i9FlhSSCDuk/Lyh3o+vJl3GKFMezua5+rFG+H8wPSCN9tkrf+zpW1ynyXC+xEn9eenLcryyqa9G2MYR1FgClxLTgZzAHYCnmMgsMxxvMVOlI6nLS3sFh4+14j8wgPbv4TzH3AI7PxcGbOvWGvlTsLRL/nmQ==",
+            "metadata": { "description": "Admin SSH key for the Virtual Machines." }
         }
     },
     "variables": {
         "tierName": {
             "regserver": "regserver",
-            "regserverdatabase": "regserverdatabase",
+            "database": "database",
             "hostserver": "hostserver",
             "webportal": "webportal",
             "jumphost": "jumphost"
@@ -66,14 +74,15 @@
                 }
             },
             "tenantName": "[parameters('tenantName')]",
-            "adminUsername": "[parameters('adminUsername')]",
-            "adminSecureShellKey": "[parameters('adminSecureShellKey')]",
+            "repositoryUrl": "[parameters('repositoryUrl')]",
             "longtermResourceGroupName": "[parameters('longtermResourceGroupName')]",
+            "hostServerInstanceCount": "[parameters('hostServerInstanceCount')]",
             "deployRegServer": "[parameters('deployRegServer')]",
-            "danielsSpezialwert": 2,
             "regServerInstanceCount": "[parameters('regServerInstanceCount')]",
             "deployPortalServer": "[parameters('deployPortalServer')]",
-            "repositoryUrl": "[parameters('repositoryUrl')]",
+            "portalServerInstanceCount": "[parameters('portalServerInstanceCount')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminSecureShellKey": "[parameters('adminSecureShellKey')]",
             "ipAddressId": {
                 "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-regserver'))]",
                 "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-hostserver'))]",
@@ -93,9 +102,9 @@
                         "nsgName": "[concat('nsg-', variables('tierName').regserver)]",
                         "address": "10.0.1.0/24"
                     },
-                    "regserverdatabase": {
-                        "name": "[concat('subnet-', variables('tierName').regserverdatabase)]",
-                        "nsgName": "[concat('nsg-', variables('tierName').regserverdatabase)]",
+                    "database": {
+                        "name": "[concat('subnet-', variables('tierName').database)]",
+                        "nsgName": "[concat('nsg-', variables('tierName').database)]",
                         "address": "10.0.2.0/24"
                     },
                     "hostserver": {
@@ -122,7 +131,7 @@
                 },
                 "size": {
                     "regserver": "Standard_A1",
-                    "regserverdatabase": "Standard_A1",
+                    "database": "Standard_A1",
                     "hostserver": "Standard_A1",
                     "webportal": "Standard_A1",
                     "jumphost": "Standard_A0"

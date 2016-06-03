@@ -84,9 +84,9 @@
             "apiVersion": "[variables('constants').apiVersions.storageAccounts]",
             "location": "[resourceGroup().location]",
             "name": "[concat(parameters('tenantName'), 'storage')]",
-            "tags": { "displayName": "Storage Account - Object Storage" },
+            "tags": { "displayName": "Storage Account - Object Storage (formerly S3)" },
             "properties": {
-                "accountType": "Standard_LRS"
+                "accountType": "Standard_GRS"
             }
         }
     ],
