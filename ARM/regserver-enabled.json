@@ -4,7 +4,7 @@
     "parameters": { "commonSettings": { "type": "object" } },
     "variables": {
         "nlbname": "[concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)]",
-        "nlbid": "[resourceId('Microsoft.Network/loadBalancers', variables('nlbname'))",
+        "nlbid": "[resourceId('Microsoft.Network/loadBalancers', variables('nlbname'))]",
         "storageAccountNameSuffix": "[concat(toLower(replace(parameters('commonSettings').tenantName,'-','')), 'vmss')]",
         "storageAccountPrefix": [ "a", "g", "m", "s", "y" ]
     },
