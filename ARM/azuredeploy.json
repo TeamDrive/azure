@@ -74,6 +74,11 @@
             "virtualMachineScaleSets": "2015-06-15",
             "deployments": "2015-01-01"
         },
+        "ipAddressId": {
+            "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-regserver'))]",
+            "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-hostserver'))]",
+            "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-webportal'))]"
+        },
         "commonSettings": {
             "constants": {
                 "apiVersions": {
@@ -105,9 +110,9 @@
                 "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-webportal'))]"
             },
             "fqdn": {
-                "regserver": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('commonSettings').ipAddressId.regserver), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]",
-                "hostserver": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('commonSettings').ipAddressId.hostserver), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]",
-                "webportal": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('commonSettings').ipAddressId.webportal), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]"
+                "regserver": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('ipAddressId').regserver), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]",
+                "hostserver": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('ipAddressId').hostserver), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]",
+                "webportal": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('ipAddressId').webportal), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]"
             },
             "vnet": {
                 "name": "[concat(parameters('tenantName'),'-vnet')]",
