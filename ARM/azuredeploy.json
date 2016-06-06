@@ -63,6 +63,17 @@
             "webportal": "webportal",
             "jumphost": "jumphost"
         },
+        "apiVersions": {
+            "storageAccounts": "2015-06-15",
+            "networkSecurityGroups": "2015-06-15",
+            "loadBalancers": "2016-03-30",
+            "virtualNetworks": "2015-06-15",
+            "publicIPAddresses": "2015-06-15",
+            "networkInterfaces": "2015-06-15",
+            "virtualMachines": "2015-06-15",
+            "virtualMachineScaleSets": "2015-06-15",
+            "deployments": "2015-01-01"
+        },
         "commonSettings": {
             "constants": {
                 "apiVersions": {
@@ -92,6 +103,11 @@
                 "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-regserver'))]",
                 "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-hostserver'))]",
                 "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-webportal'))]"
+            },
+            "fqdn": {
+                "regserver": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('commonSettings').ipAddressId.regserver), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]",
+                "hostserver": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('commonSettings').ipAddressId.hostserver), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]",
+                "webportal": "[reference(concat('Microsoft.Network/publicIPAddresses/', variables('commonSettings').ipAddressId.webportal), variables('apiVersions').publicIPAddresses).dnsSettings.fqdn]"
             },
             "vnet": {
                 "name": "[concat(parameters('tenantName'),'-vnet')]",

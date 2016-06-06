@@ -2,10 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": { "commonSettings": { "type": "object" } },
+    "variables": {
+        "nlbname": "[concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)]",
+        "nlbid": "[resourceId('Microsoft.Network/loadBalancers', variables('nlbname'))",
+        "storageAccountNameSuffix": "[concat(toLower(replace(parameters('commonSettings').tenantName,'-','')), 'vmss')]",
+        "storageAccountPrefix": [ "a", "g", "m", "s", "y" ]
+    },
     "resources": [
         {
             "type": "Microsoft.Network/loadBalancers",
-            "name": "[concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)]",
+            "name": "[variables('nlbname')]",
             "location": "[resourceGroup().location]",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.loadBalancers]",
             "properties": {
@@ -21,7 +27,7 @@
                 ],
                 "backendAddressPools": [
                     {
-                        "name": "regserverBackendAddressPool"
+                        "name": "[concat('regserver', '-', 'backendAddressPool')]"
                     }
                 ],
                 "probes": [
@@ -45,13 +51,124 @@
                             "backendPort": 80,
                             "enableFloatingIP": false,
                             "idleTimeoutInMinutes": 5,
-                            "probe": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)), '/probes/', 'probe-http')]" },
-                            "frontendIPConfiguration": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
-                            "backendAddressPool": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)), '/backendAddressPools/', 'regserverBackendAddressPool')]" }
+                            "probe": { "id": "[concat(variables('nlbid'), '/probes/', 'probe-http')]" },
+                            "frontendIPConfiguration": { "id": "[concat(variables('nlbid'), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
+                            "backendAddressPool": { "id": "[concat(variables('nlbid'), '/backendAddressPools/', concat('regserver', '-', 'backendAddressPool'))]" }
                         }
                     }
-
                 ]
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.storageAccounts]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(variables('storageAccountPrefix')[copyIndex()], variables('storageAccountNameSuffix'))]",
+            "tags": { "displayName": "Storage Accounts - VM ScaleSet - Regserver" },
+            "copy": {
+                "name": "vmssstorageLoop",
+                "count": "[length(variables('storageAccountPrefix'))]"
+            },
+            "properties": { "accountType": "Standard_LRS" }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachineScaleSets]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat('vmss-', parameters('commonSettings').tenantName, '-', 'regserver')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[0], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[1], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[2], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[3], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[4], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]"
+            ],
+            "sku": {
+                "name": "[parameters('commonSettings').vm.size.regserver]",
+                "tier": "Standard",
+                "capacity": "[parameters('commonSettings').regServerInstanceCount]"
+            },
+            "tags": { "displayName": "Virtual Machine ScaleSet" },
+            "properties": {
+                "upgradePolicy": {
+                    "mode": "Automatic"
+                },
+                "virtualMachineProfile": {
+                    "storageProfile": {
+                        "osDisk": {
+                            "name": "VMSSOsDisk",
+                            "caching": "ReadWrite",
+                            "createOption": "FromImage",
+                            "vhdContainers": [
+                                "[concat('https://',variables('storageAccountPrefix')[0],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[1],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[2],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[3],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[4],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]"
+                            ]
+                        },
+                        "imageReference": {
+                            "publisher": "[parameters('commonSettings').vm.images.standard.publisher]",
+                            "offer": "[parameters('commonSettings').vm.images.standard.offer]",
+                            "sku": "[parameters('commonSettings').vm.images.standard.sku]",
+                            "version": "[parameters('commonSettings').vm.images.standard.version]"
+                        }
+                    },
+                    "osProfile": {
+                        "computerNamePrefix": "regserver",
+                        "adminUsername": "[parameters('commonSettings').adminUsername]",
+                        "linuxConfiguration": {
+                            "disablePasswordAuthentication": "true",
+                            "ssh": {
+                                "publicKeys": [
+                                    {
+                                        "path": "[concat('/home/', parameters('commonSettings').adminUsername, '/.ssh/authorized_keys')]",
+                                        "keyData": "[parameters('commonSettings').adminSecureShellKey]"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "networkProfile": {
+                        "networkInterfaceConfigurations": [
+                            {
+                                "name": "vmssnic",
+                                "properties": {
+                                    "primary": true,
+                                    "ipConfigurations": [
+                                        {
+                                            "name": "myVirtualMachineScaleSetIpConfiguration",
+                                            "properties": {
+                                                "subnet": { "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('commonSettings').vnet.name), '/subnets/', parameters('commonSettings').vnet.subnet.regserver.name)]" },
+                                                "loadBalancerBackendAddressPools": [ { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('nlbname'), '/backendAddressPools/', concat('regserver', '-', 'backendAddressPool')))]" } ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "extensionProfile": {
+                        "extensions": [
+                            {
+                                "name": "CustomScriptExtensionVMSS",
+                                "properties": {
+                                    "publisher": "Microsoft.OSTCExtensions",
+                                    "type": "CustomScriptForLinux",
+                                    "typeHandlerVersion": "1.4",
+                                    "autoUpgradeMinorVersion": false,
+                                    "settings": {
+                                        "fileUris": [
+                                            "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-', 'regserver', '.sh')]"
+                                        ],
+                                        "commandToExecute": "[concat('bash install-', 'regserver', '.sh', ' ', parameters('commonSettings').fqdn.regserver)]"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
             }
         }
     ]
