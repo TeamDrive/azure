@@ -4,6 +4,57 @@
     "parameters": { "commonSettings": { "type": "object" } },
     "resources": [
         {
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "[concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)]",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.loadBalancers]",
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "myLoadBalancerFrontEnd",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[parameters('commonSettings').ipAddressId.regserver]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "regserverBackendAddressPool"
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "probe-http",
+                        "properties": {
+                            "protocol": "Http",
+                            "port": 80,
+                            "intervalInSeconds": 5,
+                            "numberOfProbes": 2,
+                            "requestPath": "/"
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "nlb-rule-http",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "frontendPort": 80,
+                            "backendPort": 80,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5,
+                            "probe": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)), '/probes/', 'probe-http')]" },
+                            "frontendIPConfiguration": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
+                            "backendAddressPool": { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', concat('loadbalancer-', 'regserver', '-', parameters('commonSettings').tenantName)), '/backendAddressPools/', 'regserverBackendAddressPool')]" }
+                        }
+                    }
+
+                ]
+            }
+        },
+        {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkInterfaces]",
             "location": "[resourceGroup().location]",
