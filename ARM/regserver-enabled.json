@@ -77,11 +77,11 @@
             "location": "[resourceGroup().location]",
             "name": "[concat('vmss-', parameters('commonSettings').tenantName, '-', 'regserver')]",
             "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[0], variables('newStorageAccountSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[1], variables('newStorageAccountSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[2], variables('newStorageAccountSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[3], variables('newStorageAccountSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[4], variables('newStorageAccountSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[0], variables('storageAccountNameSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[1], variables('storageAccountNameSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[2], variables('storageAccountNameSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[3], variables('storageAccountNameSuffix'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[4], variables('storageAccountNameSuffix'))]",
                 "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]"
             ],
             "sku": {
@@ -101,11 +101,11 @@
                             "caching": "ReadWrite",
                             "createOption": "FromImage",
                             "vhdContainers": [
-                                "[concat('https://',variables('storageAccountPrefix')[0],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
-                                "[concat('https://',variables('storageAccountPrefix')[1],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
-                                "[concat('https://',variables('storageAccountPrefix')[2],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
-                                "[concat('https://',variables('storageAccountPrefix')[3],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
-                                "[concat('https://',variables('storageAccountPrefix')[4],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]"
+                                "[concat('https://', variables('storageAccountPrefix')[0], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
+                                "[concat('https://', variables('storageAccountPrefix')[1], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
+                                "[concat('https://', variables('storageAccountPrefix')[2], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
+                                "[concat('https://', variables('storageAccountPrefix')[3], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
+                                "[concat('https://', variables('storageAccountPrefix')[4], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]"
                             ]
                         },
                         "imageReference": {
@@ -162,7 +162,7 @@
                                         "fileUris": [
                                             "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-', 'regserver', '.sh')]"
                                         ],
-                                        "commandToExecute": "[concat('bash install-', 'regserver', '.sh', ' ', parameters('commonSettings').fqdn.regserver)]"
+                                        "commandToExecute": "[concat('bash install-', 'regserver', '.sh', ' ', 'TODO host server')]"
                                     }
                                 }
                             }
