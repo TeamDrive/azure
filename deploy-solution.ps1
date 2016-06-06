@@ -1,6 +1,8 @@
 $tenantName = (Get-Content -Path "tenantName.txt").Trim()
 $location="West Europe"
 
+# concat(parameters('tenantName'), variables('publicIPs').webportal)
+
 $authorizedKeyFilename = "C:\Users\chgeuer\puttykeys\authorizedkeys.txt"
 $githubUser = "chgeuer"
 $githubProject = "td"
@@ -17,6 +19,7 @@ $hostServerInstanceCount = 1
 $regServerInstanceCount = 2
 $portalServerInstanceCount = 0
 $databaseNodeInstanceCount = 1
+
 
 $commonSettings = @{
 	tenantName=$tenantName
