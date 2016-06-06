@@ -53,30 +53,6 @@
 
                 ]
             }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkInterfaces]",
-            "location": "[resourceGroup().location]",
-            "name": "nic-regserver",
-            "tags": { "displayName": "RegServer - Network Interface Card" },
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "10.0.1.10",
-                            "publicIPAddress": {
-                                "id": "[parameters('commonSettings').ipAddressId.regserver]"
-                            },
-                            "subnet": {
-                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.regserver.name)]"
-                            }
-                        }
-                    }
-                ]
-            }
         }
     ]
 }
