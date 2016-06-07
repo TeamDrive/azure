@@ -141,7 +141,7 @@
                                             "name": "myVirtualMachineScaleSetIpConfiguration",
                                             "properties": {
                                                 "subnet": { "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('commonSettings').vnet.name), '/subnets/', parameters('commonSettings').vnet.subnet.regserver.name)]" },
-                                                "loadBalancerBackendAddressPools": [ { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('nlbname'), '/backendAddressPools/', concat('regserver', '-', 'backendAddressPool')))]" } ]
+                                                "loadBalancerBackendAddressPools": [ { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('nlbname')), '/backendAddressPools/', concat('regserver', '-', 'backendAddressPool'))]" } ]
                                             }
                                         }
                                     ]
