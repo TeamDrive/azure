@@ -14,12 +14,26 @@ $repositoryUrl = "https://raw.githubusercontent.com/$($githubUser)/$($githubProj
 Write-Host "Pusing to '$($repositoryUrl)'"
 $_ignore = & git push origin master -q
 
+$longtermResourceGroupName = "longterm-$($tenantName)"
+
+New-AzureRmResourceGroup `
+	-Name $longtermResourceGroupName `
+	-Location $location `
+	-Force
+
+$longtermGroupDeploymentResults = New-AzureRmResourceGroupDeployment `
+	-ResourceGroupName $longtermResourceGroupName `
+	-TemplateUri "$($repositoryUrl)/ARM/longterm.json" `
+	-TemplateParameterObject @{ tenantName=$tenantName } `
+	-Mode Complete  `
+	-Verbose `
+	-Force
+
 $resourceGroupName="rg-$($tenantName)"
 $hostServerInstanceCount = 1
 $regServerInstanceCount = 2
 $portalServerInstanceCount = 0
 $databaseNodeInstanceCount = 1
-
 
 $commonSettings = @{
 	tenantName=$tenantName
@@ -33,7 +47,14 @@ $commonSettings = @{
 	databaseNodeInstanceCount=$databaseNodeInstanceCount
 	adminUsername=$env:USERNAME.ToLower()
 	adminSecureShellKey=$(Get-Content -Path $authorizedKeyFilename).Trim()
+	regserverIp=$longtermGroupDeploymentResults.Outputs['regserver-ip'].Value
+	regserverFqdn=$longtermGroupDeploymentResults.Outputs['regserver-fqdn'].Value
+	hostserverIp=$longtermGroupDeploymentResults.Outputs['hostserver-ip'].Value
+	hostserverFqdn=$longtermGroupDeploymentResults.Outputs['hostserver-fqdn'].Value
+	webportalIp=$longtermGroupDeploymentResults.Outputs['webportal-ip'].Value
+	webportalFqdn=$longtermGroupDeploymentResults.Outputs['webportal-fqdn'].Value
 }
+
 
 New-AzureRmResourceGroup `
  	-Name $resourceGroupName `
@@ -49,3 +70,6 @@ $deploymentResult = New-AzureRmResourceGroupDeployment `
 	-Verbose
 
 Write-Host "Deployment to $($commonSettings['resourceGroupName']) is $($deploymentResult.ProvisioningState)"
+
+# https://nocentdocent.wordpress.com/2015/09/24/deploying-azure-arm-templates-with-powershell/
+

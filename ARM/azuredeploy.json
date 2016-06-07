@@ -53,7 +53,13 @@
             "type": "string",
             "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAklvcJCA1K82mjlxM1ZHP1PF7eqKZ5KcmxLeNSJ7vMLD1/XUMZ667P2Ep7iu/J4Ci4u6V4LyYDodhRRFZaaxMFHTUVTwcApuh0fl4UJY/Evd6R+A66zxG8oSG75KQTiOYsV4cZ1PnMfg1Y014n814VGKd68ZHKc2KQFLGfsBZ7Hqc2NIU1Y0AxNaeHG8i9FlhSSCDuk/Lyh3o+vJl3GKFMezua5+rFG+H8wPSCN9tkrf+zpW1ynyXC+xEn9eenLcryyqa9G2MYR1FgClxLTgZzAHYCnmMgsMxxvMVOlI6nLS3sFh4+14j8wgPbv4TzH3AI7PxcGbOvWGvlTsLRL/nmQ==",
             "metadata": { "description": "Admin SSH key for the Virtual Machines." }
-        }
+        },
+        "regserverIp": { "type": "string" },
+        "regserverFqdn": { "type": "string" },
+        "hostserverIp": { "type": "string" },
+        "hostserverFqdn": { "type": "string" },
+        "webportalIp": { "type": "string" },
+        "webportalFqdn": { "type": "string" }
     },
     "variables": {
         "tierName": {
@@ -111,6 +117,20 @@
                 "regserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-regserver'))]",
                 "hostserver": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-hostserver'))]",
                 "webportal": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', parameters('longtermResourceGroupName'), '/providers/Microsoft.Network/publicIPAddresses/', concat(parameters('tenantName'), '-webportal'))]"
+            },
+            "ipAddressValues": {
+                "regserver": {
+                    "ip": "[parameters('regserverIp')]",
+                    "fqdn": "[parameters('regserverFqdn')]"
+                },
+                "hostserver": {
+                    "ip": "[parameters('hostserverIp')]",
+                    "fqdn": "[parameters('hostserverFqdn')]"
+                },
+                "webportal": {
+                    "ip": "[parameters('webportalIp')]",
+                    "fqdn": "[parameters('webportalFqdn')]"
+                }
             },
             "vnet": {
                 "name": "[concat(parameters('tenantName'),'-vnet')]",

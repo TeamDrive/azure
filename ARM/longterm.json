@@ -98,6 +98,22 @@
         "regserver-fqdn": {
             "type": "string",
             "value": "[reference(concat(parameters('tenantName'), '-', variables('publicIPs').regserver)).dnsSettings.fqdn]"
+        },
+        "hostserver-ip": {
+            "type": "string",
+            "value": "[reference(concat(parameters('tenantName'), '-', variables('publicIPs').hostserver)).ipAddress]"
+        },
+        "hostserver-fqdn": {
+            "type": "string",
+            "value": "[reference(concat(parameters('tenantName'), '-', variables('publicIPs').hostserver)).dnsSettings.fqdn]"
+        },
+        "webportal-ip": {
+            "type": "string",
+            "value": "[reference(concat(parameters('tenantName'), '-', variables('publicIPs').webportal)).ipAddress]"
+        },
+        "webportal-fqdn": {
+            "type": "string",
+            "value": "[reference(concat(parameters('tenantName'), '-', variables('publicIPs').webportal)).dnsSettings.fqdn]"
         }
     }
 }
