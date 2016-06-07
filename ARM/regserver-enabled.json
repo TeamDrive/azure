@@ -162,7 +162,7 @@
                                         "fileUris": [
                                             "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-', 'regserver', '.sh')]"
                                         ],
-                                        "commandToExecute": "[concat('bash install-', 'regserver', '.sh', ' ', parameters('commonSettings').ipAddressValues.hostserver.fqdn)]"
+                                        "commandToExecute": "[concat('bash install-', 'regserver', '.sh', ' ', parameters('commonSettings').ipAddressValues.hostserver.ip, ' ', parameters('commonSettings').ipAddressValues.hostserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.regserver.ip, ' ', parameters('commonSettings').ipAddressValues.regserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.webportal.ip, ' ', parameters('commonSettings').ipAddressValues.webportal.fqdn)]"
                                     }
                                 }
                             }
