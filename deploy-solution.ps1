@@ -15,6 +15,7 @@ Write-Host "Pusing to '$($repositoryUrl)'"
 $_ignore = & git push origin master -q
 
 $longtermResourceGroupName = "$($tenantName)-longterm"
+$resourceGroupName="$($tenantName)-rg"
 
 New-AzureRmResourceGroup `
 	-Name $longtermResourceGroupName `
@@ -29,7 +30,6 @@ $longtermGroupDeploymentResults = New-AzureRmResourceGroupDeployment `
 	-Verbose `
 	-Force
 
-$resourceGroupName="$($tenantName)-rg"
 $hostServerInstanceCount = 2
 $regServerInstanceCount = 2
 $portalServerInstanceCount = 0
@@ -38,7 +38,7 @@ $databaseNodeInstanceCount = 1
 $commonSettings = @{
 	tenantName=$tenantName
 	repositoryUrl=$repositoryUrl
-	longtermResourceGroupName="longterm-$($tenantName)"
+	longtermResourceGroupName=$longtermResourceGroupName
 	hostServerInstanceCount=$hostServerInstanceCount
 	deployRegServer=$(if($regServerInstanceCount -gt 0) { "enabled" } else { "disabled" })
 	regServerInstanceCount=$regServerInstanceCount
