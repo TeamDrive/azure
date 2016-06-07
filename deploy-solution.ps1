@@ -14,7 +14,7 @@ $repositoryUrl = "https://raw.githubusercontent.com/$($githubUser)/$($githubProj
 Write-Host "Pusing to '$($repositoryUrl)'"
 $_ignore = & git push origin master -q
 
-$longtermResourceGroupName = "longterm-$($tenantName)"
+$longtermResourceGroupName = "$($tenantName)-longterm"
 
 New-AzureRmResourceGroup `
 	-Name $longtermResourceGroupName `
@@ -29,8 +29,8 @@ $longtermGroupDeploymentResults = New-AzureRmResourceGroupDeployment `
 	-Verbose `
 	-Force
 
-$resourceGroupName="rg-$($tenantName)"
-$hostServerInstanceCount = 1
+$resourceGroupName="$($tenantName)-rg"
+$hostServerInstanceCount = 2
 $regServerInstanceCount = 2
 $portalServerInstanceCount = 0
 $databaseNodeInstanceCount = 1

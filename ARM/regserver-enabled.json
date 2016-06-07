@@ -55,6 +55,19 @@
                             "frontendIPConfiguration": { "id": "[concat(variables('nlbid'), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
                             "backendAddressPool": { "id": "[concat(variables('nlbid'), '/backendAddressPools/', concat('regserver', '-', 'backendAddressPool'))]" }
                         }
+                    },
+                    {
+                        "name": "nlb-rule-https",
+                        "properties": {
+                            "protocol": "Tcp",
+                            "frontendPort": 443,
+                            "backendPort": 443,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5,
+                            "probe": { "id": "[concat(variables('nlbid'), '/probes/', 'probe-http')]" },
+                            "frontendIPConfiguration": { "id": "[concat(variables('nlbid'), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
+                            "backendAddressPool": { "id": "[concat(variables('nlbid'), '/backendAddressPools/', concat('regserver', '-', 'backendAddressPool'))]" }
+                        }
                     }
                 ]
             }
@@ -160,9 +173,9 @@
                                     "autoUpgradeMinorVersion": false,
                                     "settings": {
                                         "fileUris": [
-                                            "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-', 'regserver', '.sh')]"
+                                            "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-regserver.sh')]"
                                         ],
-                                        "commandToExecute": "[concat('bash install-', 'regserver', '.sh', ' ', parameters('commonSettings').ipAddressValues.hostserver.ip, ' ', parameters('commonSettings').ipAddressValues.hostserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.regserver.ip, ' ', parameters('commonSettings').ipAddressValues.regserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.webportal.ip, ' ', parameters('commonSettings').ipAddressValues.webportal.fqdn)]"
+                                        "commandToExecute": "[concat('bash install-regserver.sh', ' ', parameters('commonSettings').ipAddressValues.hostserver.ip, ' ', parameters('commonSettings').ipAddressValues.hostserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.regserver.ip, ' ', parameters('commonSettings').ipAddressValues.regserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.webportal.ip, ' ', parameters('commonSettings').ipAddressValues.webportal.fqdn)]"
                                     }
                                 }
                             }

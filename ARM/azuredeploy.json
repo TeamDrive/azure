@@ -247,6 +247,26 @@
             }
         },
         {
+            "name": "[concat(variables('tierName').hostserver, '-resources')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('commonSettings').constants.apiVersions.deployments]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('commonSettings').repositoryUrl, 'ARM/hostserver.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
+                    }
+                }
+            }
+        },
+        {
             "name": "[concat(variables('tierName').database, '-resources')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('commonSettings').constants.apiVersions.deployments]",
