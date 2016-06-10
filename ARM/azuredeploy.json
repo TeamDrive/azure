@@ -60,6 +60,7 @@
         "hostserverFqdn": { "type": "string" },
         "webportalIp": { "type": "string" },
         "webportalFqdn": { "type": "string" }
+
     },
     "variables": {
         "tierName": {

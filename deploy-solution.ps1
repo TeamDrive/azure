@@ -53,9 +53,7 @@ $commonSettings = @{
 	hostserverFqdn=$longtermGroupDeploymentResults.Outputs['hostserver-fqdn'].Value
 	webportalIp=$longtermGroupDeploymentResults.Outputs['webportal-ip'].Value
 	webportalFqdn=$longtermGroupDeploymentResults.Outputs['webportal-fqdn'].Value
-	gaga="tralla"
 }
-
 
 New-AzureRmResourceGroup `
  	-Name $resourceGroupName `
@@ -73,4 +71,3 @@ $deploymentResult = New-AzureRmResourceGroupDeployment `
 Write-Host "Deployment to $($commonSettings['resourceGroupName']) is $($deploymentResult.ProvisioningState)"
 
 # https://nocentdocent.wordpress.com/2015/09/24/deploying-azure-arm-templates-with-powershell/
-
