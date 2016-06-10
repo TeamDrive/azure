@@ -53,6 +53,7 @@ $commonSettings = @{
 	hostserverFqdn=$longtermGroupDeploymentResults.Outputs['hostserver-fqdn'].Value
 	webportalIp=$longtermGroupDeploymentResults.Outputs['webportal-ip'].Value
 	webportalFqdn=$longtermGroupDeploymentResults.Outputs['webportal-fqdn'].Value
+	gaga="tralla"
 }
 
 
