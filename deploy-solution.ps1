@@ -1,6 +1,10 @@
 $tenantName = (Get-Content -Path "tenantName.txt").Trim()
 $location="West Europe"
 
+$cloudStorageDomainAzureCloud = "core.windows.net"
+$cloudStorageDomainGermany = "core.cloudapi.de"
+$cloudStorageDomain = $cloudStorageDomainAzureCloud
+
 # concat(parameters('tenantName'), variables('publicIPs').webportal)
 
 $authorizedKeyFilename = "C:\Users\chgeuer\puttykeys\authorizedkeys.txt"
@@ -37,6 +41,7 @@ $databaseNodeInstanceCount = 1
 
 $commonSettings = @{
 	tenantName=$tenantName
+	cloudStorageDomain=$cloudStorageDomain
 	repositoryUrl=$repositoryUrl
 	longtermResourceGroupName=$longtermResourceGroupName
 	hostServerInstanceCount=$hostServerInstanceCount

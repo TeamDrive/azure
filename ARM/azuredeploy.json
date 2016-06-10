@@ -6,6 +6,10 @@
             "type": "string",
             "defaultValue": "nrw"
         },
+        "cloudStorageDomain": {
+            "type": "string",
+            "defaultValue": "core.windows.net"
+        },
         "repositoryUrl": {
             "type": "string",
             "defaultValue": "https://raw.githubusercontent.com/chgeuer/td/master/"
@@ -101,7 +105,7 @@
                 }
             },
             "environment": {
-                "blobEndpoint": "blob.core.windows.net"
+                "blobEndpoint": "[concat('blob.', parameters('cloudStorageDomain'))]"
             },
             "tenantName": "[parameters('tenantName')]",
             "repositoryUrl": "[parameters('repositoryUrl')]",
