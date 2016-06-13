@@ -56,6 +56,7 @@
             "tags": { "displayName": "Database - Virtual Machine" },
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'databaseos'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'databasedata'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', concat('nic-database-', copyIndex()))]"
             ],
             "properties": {
@@ -121,6 +122,31 @@
                             "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-database-', copyIndex()))]"
                         }
                     ]
+                }
+            }
+        },
+        {
+            "copy": {
+                "name": "databaseVmExtensionCopy",
+                "count": "[parameters('commonSettings').databaseNodeInstanceCount]"
+            },
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-vm-database-', copyIndex(), '-extension')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('commonSettings').tenantName, '-vm-database-', copyIndex()))]"
+            ],
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.4",
+                "autoUpgradeMinorVersion": false,
+                "settings": {
+                    "fileUris": [
+                        "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-db.sh')]"
+                    ],
+                    "commandToExecute": "[concat('bash install-db.sh')]"
                 }
             }
         }
