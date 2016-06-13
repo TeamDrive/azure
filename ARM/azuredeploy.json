@@ -259,7 +259,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('commonSettings').constants.apiVersions.deployments]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', variables('tierName').webportal)]"
+                "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
             ],
             "properties": {
                 "mode": "Incremental",
