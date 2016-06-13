@@ -81,7 +81,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('commonSettings').tenantName, '-database-osdisk-', copyIndex())]",
                         "vhd": {
-                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'databaseos'), '.blob.core.windows.net/vhds/database-osdisk-', copyIndex(), '.vhd') ]"
+                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'databaseos'), parameters('commonSettings').environment.blobEndpoint, '/vhds/database-osdisk-', copyIndex(), '.vhd') ]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"

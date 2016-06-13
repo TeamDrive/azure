@@ -327,11 +327,11 @@
                             "caching": "ReadWrite",
                             "createOption": "FromImage",
                             "vhdContainers": [
-                                "[concat('https://',variables('storageAccountPrefix')[0],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
-                                "[concat('https://',variables('storageAccountPrefix')[1],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
-                                "[concat('https://',variables('storageAccountPrefix')[2],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
-                                "[concat('https://',variables('storageAccountPrefix')[3],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]",
-                                "[concat('https://',variables('storageAccountPrefix')[4],variables('newStorageAccountSuffix'),'.blob.core.windows.net/vmss')]"
+                                "[concat('https://',variables('storageAccountPrefix')[0],variables('newStorageAccountSuffix'), parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[1],variables('newStorageAccountSuffix'), parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[2],variables('newStorageAccountSuffix'), parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[3],variables('newStorageAccountSuffix'), parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
+                                "[concat('https://',variables('storageAccountPrefix')[4],variables('newStorageAccountSuffix'), parameters('commonSettings').environment.blobEndpoint, '/vmss')]"
                             ]
                         },
                         "imageReference": {

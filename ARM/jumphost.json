@@ -35,7 +35,7 @@
                         "name": "ipconfig-jumphost",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.jumphost.addressRangePrefix, '10')]",
+                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.jumphost.addressRangePrefix, '.', '10')]",
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('commonSettings').tenantName, '-', 'jumphost'))]"
                             },
@@ -96,7 +96,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('commonSettings').tenantName, '-jumphost-osdisk')]",
                         "vhd": {
-                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'jumphost'), '.blob.core.windows.net/vhds/jumphost-osdisk.vhd') ]"
+                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'jumphost'), parameters('commonSettings').environment.blobEndpoint, '/vhds/jumphost-osdisk.vhd') ]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
