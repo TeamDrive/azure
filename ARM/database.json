@@ -9,9 +9,15 @@
             "location": "[resourceGroup().location]",
             "properties": { "accountType": "Standard_LRS" },
             "name": "[concat(parameters('commonSettings').tenantName, 'databaseos')]",
-            "tags": {
-                "displayName": "StorageAccount database"
-            }
+            "tags": { "displayName": "StorageAccount database" }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.storageAccounts]",
+            "location": "[resourceGroup().location]",
+            "properties": { "accountType": "Standard_LRS" },
+            "name": "[concat(parameters('commonSettings').tenantName, 'databasedata')]",
+            "tags": { "displayName": "StorageAccount database Datadisks" }
         },
         {
             "copy": {
@@ -47,7 +53,7 @@
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
             "location": "[resourceGroup().location]",
             "name": "[concat(parameters('commonSettings').tenantName, '-vm-database-', copyIndex())]",
-            "tags": { "displayName": "Jump Host - Virtual Machine" },
+            "tags": { "displayName": "Database - Virtual Machine" },
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'databaseos'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', concat('nic-database-', copyIndex()))]"
@@ -85,7 +91,29 @@
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
-                    }
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "sql-data-0",
+                            "diskSizeGB": "1023",
+                            "lun": 0,
+                            "vhd": {
+                                "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'databasedata'), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/database-datadisk-vm', copyIndex(), '-lun0.vhd') ]"
+                            },
+                            "caching": "ReadOnly",
+                            "createOption": "Empty"
+                        },
+                        {
+                            "name": "sql-data-1",
+                            "diskSizeGB": "1023",
+                            "lun": 1,
+                            "vhd": {
+                                "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'databasedata'), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/database-datadisk-vm', copyIndex(), '-lun1.vhd') ]"
+                            },
+                            "caching": "ReadOnly",
+                            "createOption": "Empty"
+                        }
+                    ]
                 },
                 "networkProfile": {
                     "networkInterfaces": [

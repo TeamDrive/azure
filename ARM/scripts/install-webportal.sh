@@ -16,3 +16,7 @@ echo "$regserverFQDN"  > regserverFQDN.txt
 echo "$webportalIP"    > webportalIP.txt
 echo "$webportalFQDN"  > webportalFQDN.txt
 
+yum -y update
+yum -y install httpd
+service httpd start
+
