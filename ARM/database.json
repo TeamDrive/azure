@@ -57,7 +57,7 @@
                     "vmSize": "[parameters('commonSettings').vm.size.database]"
                 },
                 "osProfile": {
-                    "computerName": "database",
+                    "computerName": "[concat('database-', copyIndex())]",
                     "adminUsername": "[parameters('commonSettings').adminUsername]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": "true",
