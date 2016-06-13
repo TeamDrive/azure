@@ -8,6 +8,10 @@
         },
         "cloudStorageDomain": {
             "type": "string",
+            "allowedValues": [
+                "core.windows.net",
+                "core.cloudapi.de"
+            ],
             "defaultValue": "core.windows.net"
         },
         "repositoryUrl": {
@@ -64,7 +68,6 @@
         "hostserverFqdn": { "type": "string" },
         "webportalIp": { "type": "string" },
         "webportalFqdn": { "type": "string" }
-
     },
     "variables": {
         "tierName": {

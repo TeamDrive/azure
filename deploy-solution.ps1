@@ -1,9 +1,13 @@
 $tenantName = (Get-Content -Path "tenantName.txt").Trim()
-$location="West Europe"
+$useGermany = $false
 
-$cloudStorageDomainAzureCloud = "core.windows.net"
-$cloudStorageDomainGermany = "core.cloudapi.de"
-$cloudStorageDomain = $cloudStorageDomainAzureCloud
+if ($useGermany) {
+	$location="Germany Central"
+	$cloudStorageDomain = "core.cloudapi.de"
+} else {
+	$location="West Europe"
+	$cloudStorageDomain = "core.windows.net"
+}
 
 # concat(parameters('tenantName'), variables('publicIPs').webportal)
 
