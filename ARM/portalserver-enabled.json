@@ -5,8 +5,8 @@
     "variables": {
         "nlbname": "[concat('loadbalancer-', 'webportal', '-', parameters('commonSettings').tenantName)]",
         "nlbid": "[resourceId('Microsoft.Network/loadBalancers', variables('nlbname'))]",
-        "storageAccountNameSuffix": "[concat(toLower(replace(parameters('commonSettings').tenantName,'-','')), 'webportal', 'vmss')]",
-        "storageAccountPrefix": [ "a", "g", "m", "s", "y" ]
+        "storageAccountPrefix": [ "a", "g", "m", "s", "y" ],
+        "storageAccountNameSuffix": "[concat(toLower(replace(parameters('commonSettings').tenantName,'-','')), 'web')]"
     },
     "resources": [
         {
