@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# All stuff ends up in /var/lib/waagent/Microsoft.OSTCExtensions.CustomScriptForLinux-1.4.1.0/download/0
+
 hostserverIP=$1
 hostserverFQDN=$2
 regserverIP=$3
@@ -13,3 +15,4 @@ echo "$regserverIP"    > regserverIP.txt
 echo "$regserverFQDN"  > regserverFQDN.txt
 echo "$webportalIP"    > webportalIP.txt
 echo "$webportalFQDN"  > webportalFQDN.txt
+

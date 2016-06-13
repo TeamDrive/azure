@@ -255,6 +255,26 @@
             }
         },
         {
+            "name": "[concat(variables('tierName').portalserver, '-resources')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('commonSettings').constants.apiVersions.deployments]",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'portalserver')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('commonSettings').repositoryUrl, 'ARM/', concat('portalserver-', parameters('deployPortalServer'), '.json'))]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
+                    }
+                }
+            }
+        },
+        {
             "name": "[concat(variables('tierName').hostserver, '-resources')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('commonSettings').constants.apiVersions.deployments]",
