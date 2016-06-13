@@ -94,7 +94,7 @@
                     },
                     "dataDisks": [
                         {
-                            "name": "sql-data-0",
+                            "name": "[concat('sql-data-vm-', copyIndex(), '-lun0')]",
                             "diskSizeGB": "1023",
                             "lun": 0,
                             "vhd": {
@@ -104,7 +104,7 @@
                             "createOption": "Empty"
                         },
                         {
-                            "name": "sql-data-1",
+                            "name": "[concat('sql-data-vm-', copyIndex(), '-lun1')]",
                             "diskSizeGB": "1023",
                             "lun": 1,
                             "vhd": {
@@ -119,6 +119,25 @@
                     "networkInterfaces": [
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-database-', copyIndex()))]"
+                        }
+                    ]
+                },
+                "extensionProfile": {
+                    "extensions": [
+                        {
+                            "name": "CustomScriptExtension",
+                            "properties": {
+                                "publisher": "Microsoft.OSTCExtensions",
+                                "type": "CustomScriptForLinux",
+                                "typeHandlerVersion": "1.4",
+                                "autoUpgradeMinorVersion": true,
+                                "settings": {
+                                    "fileUris": [
+                                        "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-db.sh')]"
+                                    ],
+                                    "commandToExecute": "[concat('bash install-db.sh')]"
+                                }
+                            }
                         }
                     ]
                 }
