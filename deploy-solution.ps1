@@ -23,7 +23,7 @@ Write-Host "Pusing to '$($repositoryUrl)'"
 $_ignore = & git push origin master -q
 
 $longtermResourceGroupName = "$($tenantName)-longterm"
-$resourceGroupName="$($tenantName)-rg"
+$resourceGroupName="$($tenantName)-main"
 
 New-AzureRmResourceGroup `
 	-Name $longtermResourceGroupName `

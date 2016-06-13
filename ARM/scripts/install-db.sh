@@ -59,5 +59,5 @@ vgdisplay
 mkfs.xfs /dev/data/sqldata
 
 mkdir /mnt/datadisks
-
 echo -e "/dev/mapper/data-sqldata\t/mnt/datadisks\txfs\tdefaults\t0\t0" >> /etc/fstab
+mount /mnt/datadisks
