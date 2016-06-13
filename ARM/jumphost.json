@@ -96,7 +96,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('commonSettings').tenantName, '-jumphost-osdisk')]",
                         "vhd": {
-                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'jumphost'), parameters('commonSettings').environment.blobEndpoint, '/vhds/jumphost-osdisk.vhd') ]"
+                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'jumphost'), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/jumphost-osdisk.vhd') ]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"

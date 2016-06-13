@@ -90,12 +90,12 @@
             "location": "[resourceGroup().location]",
             "name": "[concat('vmss-', parameters('commonSettings').tenantName, '-', 'hostserver')]",
             "dependsOn": [
+                "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]",
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[0], variables('storageAccountNameSuffix'))]",
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[1], variables('storageAccountNameSuffix'))]",
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[2], variables('storageAccountNameSuffix'))]",
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[3], variables('storageAccountNameSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[4], variables('storageAccountNameSuffix'))]",
-                "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]"
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[4], variables('storageAccountNameSuffix'))]"
             ],
             "sku": {
                 "name": "[parameters('commonSettings').vm.size.hostserver]",
