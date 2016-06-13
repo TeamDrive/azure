@@ -255,11 +255,11 @@
             }
         },
         {
-            "name": "[concat(variables('tierName').portalserver, '-resources')]",
+            "name": "[concat(variables('tierName').webportal, '-resources')]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "[variables('commonSettings').constants.apiVersions.deployments]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'portalserver')]"
+                "[concat('Microsoft.Resources/deployments/', variables('tierName').webportal)]"
             ],
             "properties": {
                 "mode": "Incremental",
