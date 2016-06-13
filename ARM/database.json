@@ -123,31 +123,6 @@
                     ]
                 }
             }
-        },
-        {
-            "copy": {
-                "name": "databaseVmExtensionCopy",
-                "count": "[parameters('commonSettings').databaseNodeInstanceCount]"
-            },
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
-            "name": "[concat(parameters('commonSettings').tenantName, '-vm-database-', copyIndex(), '/customScriptExtension')]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('commonSettings').tenantName, '-vm-database-', copyIndex()))]"
-            ],
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publisher": "Microsoft.OSTCExtensions",
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.5",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": [
-                        "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-db.sh')]"
-                    ],
-                    "commandToExecute": "[concat('bash install-db.sh')]"
-                }
-            }
         }
     ]
 }
