@@ -12,7 +12,7 @@
                 "core.windows.net",
                 "core.cloudapi.de"
             ],
-            "defaultValue": "core.windows.net"
+            "defaultValue": "core.cloudapi.de"
         },
         "repositoryUrl": {
             "type": "string",
