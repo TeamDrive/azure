@@ -16,6 +16,6 @@ echo "$regserverFQDN"  > regserverFQDN.txt
 echo "$webportalIP"    > webportalIP.txt
 echo "$webportalFQDN"  > webportalFQDN.txt
 
-yum -y update
+yum update -y --exclude=WALinuxAgent
 yum -y install httpd
 service httpd start
