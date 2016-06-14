@@ -11,9 +11,9 @@ if ($useGermany) {
 
 # concat(parameters('tenantName'), variables('publicIPs').webportal)
 
-$authorizedKeyFilename = "C:\Users\chgeuer\puttykeys\authorizedkeys.txt"
-$githubUser = "chgeuer"
-$githubProject = "td"
+$authorizedKeyFilename = "C:\Users\teamdrive\puttykeys\authorizedkeys.txt"
+$githubUser = "TeamDrive"
+$githubProject = "azure"
 
 $_ignore = & git commit -am "." -q
 $branch =  & git rev-parse HEAD
