@@ -51,6 +51,7 @@
                             "backendPort": 80,
                             "enableFloatingIP": false,
                             "idleTimeoutInMinutes": 5,
+                            "loadDistribution": "SourceIPProtocol",
                             "probe": { "id": "[concat(variables('nlbid'), '/probes/', 'probe-http')]" },
                             "frontendIPConfiguration": { "id": "[concat(variables('nlbid'), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
                             "backendAddressPool": { "id": "[concat(variables('nlbid'), '/backendAddressPools/', concat('hostserver', '-', 'backendAddressPool'))]" }
@@ -64,6 +65,7 @@
                             "backendPort": 443,
                             "enableFloatingIP": false,
                             "idleTimeoutInMinutes": 5,
+                            "loadDistribution": "SourceIPProtocol",
                             "probe": { "id": "[concat(variables('nlbid'), '/probes/', 'probe-http')]" },
                             "frontendIPConfiguration": { "id": "[concat(variables('nlbid'), '/frontendIPConfigurations/', 'myLoadBalancerFrontEnd')]" },
                             "backendAddressPool": { "id": "[concat(variables('nlbid'), '/backendAddressPools/', concat('hostserver', '-', 'backendAddressPool'))]" }
