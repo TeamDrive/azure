@@ -96,7 +96,7 @@
                     "dataDisks": [
                         {
                             "name": "[concat('sql-data-vm-', copyIndex(), '-lun0')]",
-                            "diskSizeGB": "1023",
+                            "diskSizeGB": "50",
                             "lun": 0,
                             "vhd": {
                                 "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'databasedata'), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/database-datadisk-vm', copyIndex(), '-lun0.vhd') ]"
@@ -106,7 +106,7 @@
                         },
                         {
                             "name": "[concat('sql-data-vm-', copyIndex(), '-lun1')]",
-                            "diskSizeGB": "1023",
+                            "diskSizeGB": "50",
                             "lun": 1,
                             "vhd": {
                                 "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'databasedata'), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/database-datadisk-vm', copyIndex(), '-lun1.vhd') ]"
