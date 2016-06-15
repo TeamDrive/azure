@@ -187,10 +187,10 @@
                     }
                 },
                 "size": {
-                    "regserver": "Standard_D2",
-                    "database": "Standard_D2",
-                    "hostserver": "Standard_D2",
-                    "webportal": "Standard_D2",
+                    "regserver": "Standard_A3",
+                    "database": "Standard_A3",
+                    "hostserver": "Standard_A3",
+                    "webportal": "Standard_A3",
                     "jumphost": "Standard_A0"
                 }
             }
