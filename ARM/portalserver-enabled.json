@@ -79,7 +79,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.storageAccounts]",
             "location": "[resourceGroup().location]",
-            "name": "[concat(variables('storageAccountPrefix')[copyIndex()], variables('storageAccountNameSuffix'))]",
+            "name": "[concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix'))]",
             "tags": { "displayName": "Storage Accounts - VM ScaleSet - WebPortal" },
             "copy": {
                 "name": "vmssstorageLoop",
@@ -123,8 +123,7 @@
             "name": "[concat(parameters('commonSettings').tenantName, '-vm-webportal-', copyIndex())]",
             "tags": { "displayName": "webportal - Virtual Machine" },
             "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'webportalos'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', concat(parameters('commonSettings').tenantName, 'webportaldata'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')))]",
                 "[concat('Microsoft.Network/networkInterfaces/', concat('nic-webportal-', copyIndex()))]"
             ],
             "properties": {
@@ -156,7 +155,7 @@
                     "osDisk": {
                         "name": "[concat(parameters('commonSettings').tenantName, '-webportal-osdisk-', copyIndex())]",
                         "vhd": {
-                            "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'webportalos'), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-osdisk-', copyIndex(), '.vhd') ]"
+                            "uri": "[concat('http://', concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-osdisk-', copyIndex(), '.vhd') ]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -167,7 +166,7 @@
                             "diskSizeGB": "50",
                             "lun": 0,
                             "vhd": {
-                                "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'webportaldata'), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-datadisk-vm', copyIndex(), '-lun0.vhd') ]"
+                                "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-datadisk-vm', copyIndex(), '-lun0.vhd') ]"
                             },
                             "caching": "ReadOnly",
                             "createOption": "Empty"
@@ -177,7 +176,7 @@
                             "diskSizeGB": "50",
                             "lun": 1,
                             "vhd": {
-                                "uri": "[concat('http://', concat(parameters('commonSettings').tenantName, 'webportaldata'), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-datadisk-vm', copyIndex(), '-lun1.vhd') ]"
+                                "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-datadisk-vm', copyIndex(), '-lun1.vhd') ]"
                             },
                             "caching": "ReadOnly",
                             "createOption": "Empty"
