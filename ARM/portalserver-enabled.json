@@ -11,6 +11,14 @@
     },
     "resources": [
         {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.availabilitySets]",
+            "location": "[resourceGroup().location]",
+            "name": "availabilityset-webportal",
+            "tags": { "displayName": "Availability Set webportal" },
+            "properties": { }
+        },
+        {
             "type": "Microsoft.Network/loadBalancers",
             "name": "[variables('nlbname')]",
             "location": "[resourceGroup().location]",
@@ -98,7 +106,8 @@
             "name": "[concat('nic-portalserver-', copyIndex())]",
             "tags": { "displayName": "Portal Server - Network Interface Card" },
             "dependsOn": [
-                "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]"
+                "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', 'availabilityset-webportal')]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -126,9 +135,13 @@
             "tags": { "displayName": "webportal - Virtual Machine" },
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')))]",
-                "[concat('Microsoft.Network/networkInterfaces/', concat('nic-portalserver-', copyIndex()))]"
+                "[concat('Microsoft.Network/networkInterfaces/', concat('nic-portalserver-', copyIndex()))]",
+                "[concat('Microsoft.Compute/availabilitySets/', 'availabilityset-webportal')]"
             ],
             "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'availabilityset-webportal')]"
+                },
                 "hardwareProfile": {
                     "vmSize": "[parameters('commonSettings').vm.size.webportal]"
                 },

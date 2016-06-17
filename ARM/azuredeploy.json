@@ -104,7 +104,8 @@
                     "networkInterfaces": "2015-06-15",
                     "virtualMachines": "2015-06-15",
                     "virtualMachineScaleSets": "2015-06-15",
-                    "deployments": "2015-01-01"
+                    "deployments": "2015-01-01",
+                    "availabilitySets": "2015-01-01"
                 }
             },
             "environment": {
