@@ -105,7 +105,7 @@
                     "virtualMachines": "2015-06-15",
                     "virtualMachineScaleSets": "2015-06-15",
                     "deployments": "2015-01-01",
-                    "availabilitySets": "2015-01-01"
+                    "availabilitySets": "2016-03-30"
                 }
             },
             "environment": {
