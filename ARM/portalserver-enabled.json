@@ -115,7 +115,7 @@
         {
             "copy": {
                 "name": "webportalVmCopy",
-                "count": "[parameters('commonSettings').webportalNodeInstanceCount]"
+                "count": "[parameters('commonSettings').portalServerInstanceCount]"
             },
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
@@ -196,7 +196,7 @@
         {
             "copy": {
                 "name": "webportalVmExtensionCopy",
-                "count": "[parameters('commonSettings').webportalNodeInstanceCount]"
+                "count": "[parameters('commonSettings').portalServerInstanceCount]"
             },
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
