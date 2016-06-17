@@ -111,20 +111,19 @@
                 ]
             }
         },
-
         {
             "copy": {
-                "name": "webportalVmCopy",
+                "name": "portalServerVmCopy",
                 "count": "[parameters('commonSettings').portalServerInstanceCount]"
             },
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
             "location": "[resourceGroup().location]",
-            "name": "[concat(parameters('commonSettings').tenantName, '-vm-webportal-', copyIndex())]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-vm-portalserver-', copyIndex())]",
             "tags": { "displayName": "webportal - Virtual Machine" },
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')))]",
-                "[concat('Microsoft.Network/networkInterfaces/', concat('nic-webportal-', copyIndex()))]"
+                "[concat('Microsoft.Network/networkInterfaces/', concat('nic-portalserver-', copyIndex()))]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -194,14 +193,14 @@
         },
         {
             "copy": {
-                "name": "webportalVmExtensionCopy",
+                "name": "portalServerVmExtensionCopy",
                 "count": "[parameters('commonSettings').portalServerInstanceCount]"
             },
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
-            "name": "[concat(parameters('commonSettings').tenantName, '-vm-webportal-', copyIndex(), '/customScriptExtension')]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-vm-portalserver-', copyIndex(), '/customScriptExtension')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('commonSettings').tenantName, '-vm-webportal-', copyIndex()))]"
+                "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('commonSettings').tenantName, '-vm-portalserver-', copyIndex()))]"
             ],
             "location": "[resourceGroup().location]",
             "properties": {
