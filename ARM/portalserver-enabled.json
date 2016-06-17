@@ -97,6 +97,9 @@
             "location": "[resourceGroup().location]",
             "name": "[concat('nic-portalserver-', copyIndex())]",
             "tags": { "displayName": "Portal Server - Network Interface Card" },
+            "dependsOn": [
+                "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]"
+            ],
             "properties": {
                 "ipConfigurations": [
                     {
