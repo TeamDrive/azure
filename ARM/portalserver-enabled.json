@@ -178,7 +178,7 @@
                     "dataDisks": [
                         {
                             "name": "[concat('dockerdevicemapper-data-vm-', copyIndex())]",
-                            "diskSizeGB": "50",
+                            "diskSizeGB": "200",
                             "lun": 0,
                             "vhd": {
                                 "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-dockerdevicemapper-vm', copyIndex()) ]"
