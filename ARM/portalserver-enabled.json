@@ -177,21 +177,21 @@
                     },
                     "dataDisks": [
                         {
-                            "name": "[concat('sql-data-vm-', copyIndex(), '-lun0')]",
+                            "name": "[concat('dockerdevicemapper-data-vm-', copyIndex())]",
                             "diskSizeGB": "50",
                             "lun": 0,
                             "vhd": {
-                                "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-datadisk-vm', copyIndex(), '-lun0.vhd') ]"
+                                "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-dockerdevicemapper-vm', copyIndex()) ]"
                             },
                             "caching": "ReadOnly",
                             "createOption": "Empty"
                         },
                         {
-                            "name": "[concat('sql-data-vm-', copyIndex(), '-lun1')]",
+                            "name": "[concat('tduser-data-vm-', copyIndex())]",
                             "diskSizeGB": "50",
                             "lun": 1,
                             "vhd": {
-                                "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-datadisk-vm', copyIndex(), '-lun1.vhd') ]"
+                                "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-tduserdata-vm', copyIndex()) ]"
                             },
                             "caching": "ReadOnly",
                             "createOption": "Empty"
