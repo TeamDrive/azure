@@ -104,7 +104,8 @@
                     "networkInterfaces": "2015-06-15",
                     "virtualMachines": "2015-06-15",
                     "virtualMachineScaleSets": "2015-06-15",
-                    "deployments": "2015-01-01"
+                    "deployments": "2015-01-01",
+                    "availabilitySets": "2016-03-30"
                 }
             },
             "environment": {
@@ -183,7 +184,7 @@
                         "publisher": "OpenLogic",
                         "offer": "CentOS",
                         "sku": "7.2",
-                        "version": "latest"
+                        "version": "7.2.20160303"
                     }
                 },
                 "size": {

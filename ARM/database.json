@@ -4,6 +4,14 @@
     "parameters": { "commonSettings": { "type": "object" } },
     "resources": [
         {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.availabilitySets]",
+            "location": "[resourceGroup().location]",
+            "name": "availabilityset-database",
+            "tags": { "displayName": "Availability Set Database" },
+            "properties": { }
+        },
+        {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.storageAccounts]",
             "location": "[resourceGroup().location]",

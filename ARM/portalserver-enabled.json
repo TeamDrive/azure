@@ -6,9 +6,18 @@
         "nlbname": "[concat('loadbalancer-', 'webportal', '-', parameters('commonSettings').tenantName)]",
         "nlbid": "[resourceId('Microsoft.Network/loadBalancers', variables('nlbname'))]",
         "storageAccountPrefix": [ "a", "g", "m", "s", "y" ],
+        "storageAccountPrefixModulo": [ "a", "g", "m", "s", "y", "a", "g", "m", "s", "y", "a", "g", "m", "s", "y" ],
         "storageAccountNameSuffix": "[concat(toLower(replace(parameters('commonSettings').tenantName,'-','')), 'web')]"
     },
     "resources": [
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.availabilitySets]",
+            "location": "[resourceGroup().location]",
+            "name": "availabilityset-webportal",
+            "tags": { "displayName": "Availability Set webportal" },
+            "properties": { }
+        },
         {
             "type": "Microsoft.Network/loadBalancers",
             "name": "[variables('nlbname')]",
@@ -78,7 +87,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "[parameters('commonSettings').constants.apiVersions.storageAccounts]",
             "location": "[resourceGroup().location]",
-            "name": "[concat(variables('storageAccountPrefix')[copyIndex()], variables('storageAccountNameSuffix'))]",
+            "name": "[concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix'))]",
             "tags": { "displayName": "Storage Accounts - VM ScaleSet - WebPortal" },
             "copy": {
                 "name": "vmssstorageLoop",
@@ -87,102 +96,139 @@
             "properties": { "accountType": "Standard_LRS" }
         },
         {
-            "type": "Microsoft.Compute/virtualMachineScaleSets",
-            "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachineScaleSets]",
-            "location": "[resourceGroup().location]",
-            "name": "[concat('vmss-', parameters('commonSettings').tenantName, '-', 'webportal')]",
-            "dependsOn": [
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[0], variables('storageAccountNameSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[1], variables('storageAccountNameSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[2], variables('storageAccountNameSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[3], variables('storageAccountNameSuffix'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountPrefix')[4], variables('storageAccountNameSuffix'))]",
-                "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]"
-            ],
-            "sku": {
-                "name": "[parameters('commonSettings').vm.size.webportal]",
-                "tier": "Standard",
-                "capacity": "[parameters('commonSettings').portalServerInstanceCount]"
+            "copy": {
+                "name": "portalServerNicCopy",
+                "count": "[parameters('commonSettings').portalServerInstanceCount]"
             },
-            "tags": { "displayName": "Virtual Machine ScaleSet" },
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.networkInterfaces]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat('nic-portalserver-', copyIndex())]",
+            "tags": { "displayName": "Portal Server - Network Interface Card" },
+            "dependsOn": [
+                "[concat('Microsoft.Network/loadBalancers/', variables('nlbname'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', 'availabilityset-webportal')]"
+            ],
             "properties": {
-                "upgradePolicy": {
-                    "mode": "Automatic"
-                },
-                "virtualMachineProfile": {
-                    "storageProfile": {
-                        "osDisk": {
-                            "name": "VMSSOsDisk",
-                            "caching": "ReadWrite",
-                            "createOption": "FromImage",
-                            "vhdContainers": [
-                                "[concat('https://', variables('storageAccountPrefix')[0], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
-                                "[concat('https://', variables('storageAccountPrefix')[1], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
-                                "[concat('https://', variables('storageAccountPrefix')[2], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
-                                "[concat('https://', variables('storageAccountPrefix')[3], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]",
-                                "[concat('https://', variables('storageAccountPrefix')[4], variables('storageAccountNameSuffix'), '.', parameters('commonSettings').environment.blobEndpoint, '/vmss')]"
-                            ]
-                        },
-                        "imageReference": {
-                            "publisher": "[parameters('commonSettings').vm.images.standard.publisher]",
-                            "offer": "[parameters('commonSettings').vm.images.standard.offer]",
-                            "sku": "[parameters('commonSettings').vm.images.standard.sku]",
-                            "version": "[parameters('commonSettings').vm.images.standard.version]"
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig-webportal",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[concat(parameters('commonSettings').vnet.subnet.webportal.addressRangePrefix, '.', copyIndex(10))]",
+                            "subnet": { "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', parameters('commonSettings').vnet.name, '/subnets/', parameters('commonSettings').vnet.subnet.webportal.name)]" },
+                            "loadBalancerBackendAddressPools": [ { "id": "[concat(variables('nlbid'), '/backendAddressPools/', concat('webportal', '-', 'backendAddressPool'))]" } ]
                         }
-                    },
-                    "osProfile": {
-                        "computerNamePrefix": "webportal",
-                        "adminUsername": "[parameters('commonSettings').adminUsername]",
-                        "linuxConfiguration": {
-                            "disablePasswordAuthentication": "true",
-                            "ssh": {
-                                "publicKeys": [
-                                    {
-                                        "path": "[concat('/home/', parameters('commonSettings').adminUsername, '/.ssh/authorized_keys')]",
-                                        "keyData": "[parameters('commonSettings').adminSecureShellKey]"
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    "networkProfile": {
-                        "networkInterfaceConfigurations": [
-                            {
-                                "name": "vmssnic",
-                                "properties": {
-                                    "primary": true,
-                                    "ipConfigurations": [
-                                        {
-                                            "name": "myVirtualMachineScaleSetIpConfiguration",
-                                            "properties": {
-                                                "subnet": { "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('commonSettings').vnet.name), '/subnets/', parameters('commonSettings').vnet.subnet.webportal.name)]" },
-                                                "loadBalancerBackendAddressPools": [ { "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('nlbname')), '/backendAddressPools/', concat('webportal', '-', 'backendAddressPool'))]" } ]
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "extensionProfile": {
-                        "extensions": [
-                            {
-                                "name": "CustomScriptExtensionVMSS",
-                                "properties": {
-                                    "publisher": "Microsoft.OSTCExtensions",
-                                    "type": "CustomScriptForLinux",
-                                    "typeHandlerVersion": "1.4",
-                                    "autoUpgradeMinorVersion": false,
-                                    "settings": {
-                                        "fileUris": [
-                                            "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-webportal.sh')]"
-                                        ],
-                                        "commandToExecute": "[concat('bash install-webportal.sh', ' ', parameters('commonSettings').ipAddressValues.hostserver.ip, ' ', parameters('commonSettings').ipAddressValues.hostserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.regserver.ip, ' ', parameters('commonSettings').ipAddressValues.regserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.webportal.ip, ' ', parameters('commonSettings').ipAddressValues.webportal.fqdn)]"
-                                    }
-                                }
-                            }
-                        ]
                     }
+                ]
+            }
+        },
+        {
+            "copy": {
+                "name": "portalServerVmCopy",
+                "count": "[parameters('commonSettings').portalServerInstanceCount]"
+            },
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
+            "location": "[resourceGroup().location]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-vm-portalserver-', copyIndex())]",
+            "tags": { "displayName": "webportal - Virtual Machine" },
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')))]",
+                "[concat('Microsoft.Network/networkInterfaces/', concat('nic-portalserver-', copyIndex()))]",
+                "[concat('Microsoft.Compute/availabilitySets/', 'availabilityset-webportal')]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'availabilityset-webportal')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('commonSettings').vm.size.webportal]"
+                },
+                "osProfile": {
+                    "computerName": "[concat('webportal-', copyIndex())]",
+                    "adminUsername": "[parameters('commonSettings').adminUsername]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": "true",
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('commonSettings').adminUsername, '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('commonSettings').adminSecureShellKey]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('commonSettings').vm.images.standard.publisher]",
+                        "offer": "[parameters('commonSettings').vm.images.standard.offer]",
+                        "sku": "[parameters('commonSettings').vm.images.standard.sku]",
+                        "version": "[parameters('commonSettings').vm.images.standard.version]"
+                    },
+                    "osDisk": {
+                        "name": "[concat(parameters('commonSettings').tenantName, '-webportal-osdisk-', copyIndex())]",
+                        "vhd": {
+                            "uri": "[concat('http://', concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-osdisk-', copyIndex(), '.vhd') ]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "[concat('sql-data-vm-', copyIndex(), '-lun0')]",
+                            "diskSizeGB": "50",
+                            "lun": 0,
+                            "vhd": {
+                                "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-datadisk-vm', copyIndex(), '-lun0.vhd') ]"
+                            },
+                            "caching": "ReadOnly",
+                            "createOption": "Empty"
+                        },
+                        {
+                            "name": "[concat('sql-data-vm-', copyIndex(), '-lun1')]",
+                            "diskSizeGB": "50",
+                            "lun": 1,
+                            "vhd": {
+                                "uri": "[concat('http://',  concat(variables('storageAccountPrefixModulo')[copyIndex()], variables('storageAccountNameSuffix')), '.', parameters('commonSettings').environment.blobEndpoint, '/vhds/webportal-datadisk-vm', copyIndex(), '-lun1.vhd') ]"
+                            },
+                            "caching": "ReadOnly",
+                            "createOption": "Empty"
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic-portalserver-', copyIndex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "copy": {
+                "name": "portalServerVmExtensionCopy",
+                "count": "[parameters('commonSettings').portalServerInstanceCount]"
+            },
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "[parameters('commonSettings').constants.apiVersions.virtualMachines]",
+            "name": "[concat(parameters('commonSettings').tenantName, '-vm-portalserver-', copyIndex(), '/customScriptExtension')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('commonSettings').tenantName, '-vm-portalserver-', copyIndex()))]"
+            ],
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.4",
+                "autoUpgradeMinorVersion": false,
+                "settings": {
+                    "fileUris": [
+                        "[concat(parameters('commonSettings').repositoryUrl ,'ARM/scripts/install-webportal.sh')]"
+                    ],
+                    "commandToExecute": "[concat('bash install-webportal.sh', ' ', parameters('commonSettings').ipAddressValues.hostserver.ip, ' ', parameters('commonSettings').ipAddressValues.hostserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.regserver.ip, ' ', parameters('commonSettings').ipAddressValues.regserver.fqdn, ' ', parameters('commonSettings').ipAddressValues.webportal.ip, ' ', parameters('commonSettings').ipAddressValues.webportal.fqdn)]"
                 }
             }
         }
